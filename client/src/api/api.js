@@ -23,19 +23,23 @@ export const deleteCategory = (id) => API.delete(`categories/${id}`);
 export const updateCategory = (id, formData) =>
   API.put(`categories/${id}`, formData);
 
+// wishlist
+export const addToWishList = (formData) => API.post("wishlist/add", formData);
+export const getWishlistItem = () => API.get("wishlist");
+export const removeWishlistItem = (id) => API.delete(`/wishlist/${id}`);
 // Products
 export const getProducts = () => API.get("products");
 export const getBrands = () => API.get("products/brands");
 export const addProduct = (formData) => API.post("products", formData);
 export const deleteProduct = (id) => API.delete(`products/${id}`);
 export const updateProduct = (id, formData) =>
-API.put(`products/${id}`, formData);
+  API.put(`products/${id}`, formData);
 export const deleteProductImage = (id, formData) =>
-API.put(`products/delete-product-image/${id}`, formData);
+  API.put(`products/delete-product-image/${id}`, formData);
 
-export const addToCart = (formData) => API.post("orders/add-to-cart",formData);
-export const getCartItems = () => API.get('orders/cart-items');
-export const placeOrder = (formData) => API.post('orders',formData);
+export const addToCart = (formData) => API.post("orders/add-to-cart", formData);
+export const getCartItems = () => API.get("orders/cart-items");
+export const placeOrder = (formData) => API.post("orders", formData);
 
 // Sub Category
 export const addSubCategory = (formData) =>

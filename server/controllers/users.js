@@ -128,9 +128,9 @@ export const googleSignIn = async (req, res) => {
 };
 export const getUser = async (req, res) => {
   const user = req.user;
-  const userData = await User.findById(user.id, { password: 0 }).populate(
-    "carts"
-  );
+  const userData = await User.findById(user.id, { password: 0 })
+    .populate("carts")
+    .populate("whislistItems");
   res.status(200).json(userData);
 };
 export const getUsers = async (req, res) => {

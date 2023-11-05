@@ -13,21 +13,23 @@ import SubCategory from "./dashboard/SubCategory";
 import AddProduct from "./dashboard/AddProduct";
 import CartDetail from "./CartDetail";
 import AllProducts from "./AllProducts";
+import WishlistDetail from "./WishlistDetail";
 
 export {
-    Login,
-    Register,
-    Profile,
-    ForgotPassword,
-    ResetPassword,
-    Home,
-    CartDetail,
-    Category,
-    AllSubCategory,
-    ProductDetail,
-    Dashboard,
-    Product,
-    SubCategory,
-    AddProduct,
-    AllProducts
+  Login,
+  Register,
+  Profile,
+  ForgotPassword,
+  ResetPassword,
+  Home,
+  CartDetail,
+  Category,
+  AllSubCategory,
+  ProductDetail,
+  Dashboard,
+  Product,
+  SubCategory,
+  AddProduct,
+  AllProducts,
+  WishlistDetail,
 };

@@ -9,7 +9,10 @@ const Navbar = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const user = useSelector((state) => state.auth.user);
-  const cartLength=user?.carts?.filter(item=>item.isPlaced===false)?.length;
+  const cartLength = user?.carts?.filter(
+    (item) => item.isPlaced === false
+  )?.length;
+  const wishlistLength = user?.whislistItems?.length;
   const handleLogout = () => {
     dispatch(setLogout());
     navigate("/login");
@@ -26,10 +29,30 @@ const Navbar = () => {
           <div className="flex gap-2 items-center">
             {user && (
               <div className="flex items-center gap-6">
-                <Link to='/cart' className="w-10 h-10 rounded-full text-xl bg-zinc-300 flex-center relative"> 
-                {cartLength>0&&<span className="absolute leading-[1] -top-2 -right-2  w-6 h-6 flex-center rounded-full text-sm font-semibold bg-red-600 text-white">{cartLength}</span> }
-                
-                  {reactIcons.cart}</Link>
+                <Link
+                  to="/cart"
+                  className="w-10 h-10 rounded-full text-xl bg-zinc-300 flex-center relative"
+                >
+                  {cartLength > 0 && (
+                    <span className="absolute leading-[1] -top-2 -right-2  w-6 h-6 flex-center rounded-full text-sm font-semibold bg-red-600 text-white">
+                      {cartLength}
+                    </span>
+                  )}
+
+                  {reactIcons.cart}
+                </Link>
+                <Link
+                  to="/wishlist"
+                  className="w-10 h-10 rounded-full text-xl bg-pink-100 text-pink-500 flex-center relative"
+                >
+                  {wishlistLength > 0 && (
+                    <span className="absolute leading-[1] -top-2 -right-2  w-6 h-6 flex-center rounded-full text-sm font-semibold bg-pink-600 text-white">
+                      {wishlistLength}
+                    </span>
+                  )}
+
+                  {reactIcons.heartFill}
+                </Link>
                 <Menu as="div" className="relative">
                   <Menu.Button
                     className={

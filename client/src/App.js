@@ -3,7 +3,7 @@ import "react-toastify/dist/ReactToastify.css";
 import "./index.css";
 import { ToastContainer, toast } from "react-toastify";
 import {
-    AddProduct,
+  AddProduct,
   AllProducts,
   AllSubCategory,
   CartDetail,
@@ -17,6 +17,7 @@ import {
   Register,
   ResetPassword,
   SubCategory,
+  WishlistDetail,
 } from "./pages";
 import { getUser } from "./api/api";
 import { useDispatch } from "react-redux";
@@ -55,6 +56,7 @@ function App() {
             <Route path="/category/:id" element={<AllSubCategory />} />
             <Route path="/product/:id" element={<ProductDetail />} />
             <Route path="/cart" element={<CartDetail />} />
+            <Route path="/wishlist" element={<WishlistDetail />} />
             <Route path="/products" element={<AllProducts />} />
           </Route>
           <Route path="/dashboard" element={<DashboardLayout />}>

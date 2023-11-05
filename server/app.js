@@ -7,6 +7,7 @@ import categoryRoutes from "./routes/categories.js";
 import subCategoryRoutes from "./routes/subCategories.js";
 import productRoutes from "./routes/products.js";
 import orderRoutes from "./routes/orders.js";
+import wishListRoutes from "./routes/wishlist.js";
 import upload from "./middleware/upload.js";
 import dotenv from "dotenv";
 import morgan from "morgan";
@@ -18,8 +19,8 @@ app.use(express.static("./public/uploads"));
 app.use(bodyParser.json({ limit: "30mb", extended: true }));
 app.use(bodyParser.urlencoded({ limit: "30mb", extended: true }));
 app.use(cors({ origin: true, credentials: true }));
-app.set('view engine', 'ejs')
-app.set('views', './views')
+app.set("view engine", "ejs");
+app.set("views", "./views");
 const PORT = process.env.PORT || 5000;
 mongoose.set("strictQuery", false);
 
@@ -29,6 +30,7 @@ app.use("/categories", categoryRoutes);
 app.use("/sub-categories", subCategoryRoutes);
 app.use("/products", productRoutes);
 app.use("/orders", orderRoutes);
+app.use("/wishlist", wishListRoutes);
 app.post("/upload", upload.single("file"), (req, res) => {
   res.status(200).json(req.file.filename);
 });

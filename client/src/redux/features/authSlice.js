@@ -12,11 +12,17 @@ const authSlice = createSlice({
       state.user = action.payload;
     },
     updateUserCarts: (state, action) => {
-      state.user.carts = [...state.user.carts,action.payload];
+      state.user.carts = [...state.user.carts, action.payload];
+    },
+    setUserWishList: (state, action) => {
+      state.user.whislistItems = [...state.user.whislistItems, action.payload];
     },
     updateWholeCarts: (state, action) => {
-        state.user.carts =action.payload;
-      },
+      state.user.carts = action.payload;
+    },
+    updateWishList: (state, action) => {
+      state.user.whislistItems = action.payload;
+    },
     updateUser: (state, action) => {
       state.user = { ...state.user, ...action.payload };
     },
@@ -28,6 +34,14 @@ const authSlice = createSlice({
   extraReducers: {},
 });
 
-export const { setUser, setLogout, updateUser,updateUserCarts,updateWholeCarts } = authSlice.actions;
+export const {
+  setUser,
+  setLogout,
+  updateUser,
+  updateUserCarts,
+  updateWholeCarts,
+  setUserWishList,
+  updateWishList,
+} = authSlice.actions;
 
 export default authSlice.reducer;
