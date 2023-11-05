@@ -36,7 +36,7 @@ const ProductDetail = () => {
     if (user) {
       getProduct(id);
       user?.carts?.forEach((item) => {
-        if (String(item.product) === String(id)) {
+        if (String(item.product) === String(id) && item.isPlaced === false) {
           setGoToCart(true);
         }
       });

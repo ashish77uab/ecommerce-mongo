@@ -12,6 +12,7 @@ import {
   ForgotPassword,
   Home,
   Login,
+  OrderDetailsPage,
   Product,
   ProductDetail,
   Register,
@@ -58,6 +59,7 @@ function App() {
             <Route path="/cart" element={<CartDetail />} />
             <Route path="/wishlist" element={<WishlistDetail />} />
             <Route path="/products" element={<AllProducts />} />
+            <Route path="/orders" element={<OrderDetailsPage />} />
           </Route>
           <Route path="/dashboard" element={<DashboardLayout />}>
             <Route index element={<Dashboard />} />

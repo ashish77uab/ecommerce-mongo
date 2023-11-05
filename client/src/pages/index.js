@@ -14,6 +14,7 @@ import AddProduct from "./dashboard/AddProduct";
 import CartDetail from "./CartDetail";
 import AllProducts from "./AllProducts";
 import WishlistDetail from "./WishlistDetail";
+import OrderDetailsPage from "./OrderDetailsPage";
 
 export {
   Login,
@@ -32,4 +33,5 @@ export {
   AddProduct,
   AllProducts,
   WishlistDetail,
+  OrderDetailsPage,
 };

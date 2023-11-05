@@ -40,6 +40,7 @@ export const deleteProductImage = (id, formData) =>
 export const addToCart = (formData) => API.post("orders/add-to-cart", formData);
 export const getCartItems = () => API.get("orders/cart-items");
 export const placeOrder = (formData) => API.post("orders", formData);
+export const getAllUserOrders = (id) => API.get(`orders/user-orders/${id}`);
 
 // Sub Category
 export const addSubCategory = (formData) =>
