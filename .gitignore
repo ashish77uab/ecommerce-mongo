@@ -7,7 +7,7 @@
 client/node_modules
 server/node_modules
 server/.env
-server/public/uploads
+server/uploads
 client/.env
 
 # testing
