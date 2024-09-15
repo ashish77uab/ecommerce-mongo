@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { getBrands, getCategories, getProducts } from "../api/api";
+import {  getCategories, getProducts } from "../api/api";
 import { toast } from "react-toastify";
 import ToastMsg from "../components/toast/ToastMsg";
 import ProductCardSkeleton from "../components/cards/ProductCardSkeleton";
@@ -11,7 +11,6 @@ import TextInput from "../components/forms/TextInput";
 
 const AllProducts = () => {
     const [categories, setCategories] = useState([]);
-    const [brands, setBrands] = useState([]);
     const [priceFilter, setPriceFilter] = useState({
         min:'',
         max:''
@@ -19,6 +18,27 @@ const AllProducts = () => {
     const [products, setProducts] = useState([]);
     const [skeletonLoading, setSkeletonLoading] = useState(true);
     const [selectedSort, setSelectedSort] = useState(sortBy[0]);
+    const [selectedCategory, setSelectedCategory] = useState([]);
+    const handleApplyFilter=()=>{
+        getAllProducts({ category: selectedCategory, min: priceFilter?.min, max: priceFilter?.max, sort: selectedSort?.value });
+    }
+    const handleResetFilter =()=>{
+        getAllProducts({ category: [], min: '', max: '', sort: '' });
+        setPriceFilter({
+            min: '',
+            max: ''
+        })
+        setSelectedSort(sortBy[0])
+        setSelectedCategory([])
+    }
+    const handleSelectCategory = (e,categoryId)=>{
+        if (!selectedCategory?.includes(categoryId)){
+            setSelectedCategory([...selectedCategory, categoryId]);
+        }else{
+            setSelectedCategory(selectedCategory.filter((item) => item !== categoryId));
+
+        }
+    }
     const getAllCategories = async () => {
         try {
             const res = await getCategories();
@@ -32,22 +52,10 @@ const AllProducts = () => {
             toast.error(<ToastMsg title={error?.response?.data?.message} />);
         }
     };
-    const getAllBrands = async () => {
+    
+    const getAllProducts = async (params) => {
         try {
-            const res = await getBrands();
-            const { status, data } = res;
-            if (status >= 200 && status <= 300) {
-                setBrands(data);
-            } else {
-                toast.error(<ToastMsg title={data.message} />);
-            }
-        } catch (error) {
-            toast.error(<ToastMsg title={error?.response?.data?.message} />);
-        }
-    };
-    const getAllProducts = async () => {
-        try {
-            const res = await getProducts();
+            const res = await getProducts(params);
             const { status, data } = res;
             if (status >= 200 && status <= 300) {
                 setProducts(data);
@@ -62,9 +70,11 @@ const AllProducts = () => {
     };
     useEffect(() => {
         getAllCategories();
-        getAllProducts();
-        getAllBrands()
     }, []);
+
+    useEffect(()=>{
+        getAllProducts({ category: selectedCategory, min: priceFilter?.min, max: priceFilter?.max, sort: selectedSort?.value });
+    }, [selectedSort])
     return (
         <section>
             <div className="container flex gap-8 py-10 items-start">
@@ -79,23 +89,8 @@ const AllProducts = () => {
                                 {categories.map((item, index) => (
                                     <li key={index} className="font-medium">
                                      <label htmlFor={item._id} className="flex gap-2 items-center">
-                                        <input className="accent-amber-500 w-4 h-4" type="checkbox" name="" id={item._id} />
+                                            <input className="accent-amber-500 w-4 h-4" type="checkbox" name="category" value={item?._id} checked={selectedCategory?.includes(item?._id)} id={item._id} onChange={(e)=>handleSelectCategory(e,item?._id)}/>
                                            {item.name}
-                                     </label>
-                                    </li>
-                                ))}
-                            </ul>
-                        </header>
-                    </div>
-                    <div className="px-4 mb-4">
-                        <header>
-                            <h5 className="heading-6 mb-2">Brands</h5>
-                            <ul className="space-y-2">
-                                {brands.map((item, index) => (
-                                    <li key={index} className="font-medium">
-                                     <label htmlFor={item.brandName} className="flex gap-2 items-center">
-                                        <input className="accent-amber-500 w-4 h-4" type="checkbox" name="" id={item._id} />
-                                           {item.brandName}
                                      </label>
                                     </li>
                                 ))}
@@ -108,9 +103,11 @@ const AllProducts = () => {
                             <div className="flex gap-2">
                                 <TextInput value={priceFilter.min} onChange={(e)=>setPriceFilter({...priceFilter,min:e.target.value})} placeholder='Min'/>
                                 <TextInput value={priceFilter.max} onChange={(e)=>setPriceFilter({...priceFilter,max:e.target.value})} placeholder='Max'/>
-                                
-                                
                             </div>
+                        </div>
+                        <div className="mt-4 flex flex-col gap-2">
+                            <button onClick={handleApplyFilter} className="btn-primary w-full">Apply Filter</button>
+                            <button onClick={handleResetFilter} className="btn-secondary w-full">Reset Filter</button>
                         </div>
                     </div>
                 </div>
@@ -188,9 +185,9 @@ const AllProducts = () => {
                                   .map((_item, index) => (
                                       <ProductCardSkeleton key={index} />
                                   ))
-                            : products.map((product) => (
+                            : products?.length >0 ?  products.map((product) => (
                                   <ProductCard product={product} />
-                              ))}
+                              )) : <div className="text-center col-span-full py-8 text-xl">Not found any product</div>}
                     </div>
                 </div>
             </div>

@@ -28,7 +28,7 @@ export const addToWishList = (formData) => API.post("wishlist/add", formData);
 export const getWishlistItem = () => API.get("wishlist");
 export const removeWishlistItem = (id) => API.delete(`/wishlist/${id}`);
 // Products
-export const getProducts = () => API.get("products");
+export const getProducts = (data) => API.get(`products?min=${data?.min||''}&max=${data?.max||''}&category=${data?.category||[]}&sort=${data?.sort||''}`);
 export const getBrands = () => API.get("products/brands");
 export const addProduct = (formData) => API.post("products", formData);
 export const deleteProduct = (id) => API.delete(`products/${id}`);

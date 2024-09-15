@@ -87,17 +87,68 @@ export const getStats = async (req, res) => {
   res.status(200).json({totalProduct:productCount,totalBrands:brands});
 };
 export const getAllProduct = async (req, res) => {
-  let filter = {};
-  if (req.query.categories) {
-    filter = { category: req.query.categories.split(",") };
-  }
+  const { min, max, category,sort } = req.query;
 
-  const productList = await Product.find(filter).populate("subCategory");
+  const categoryArray = category? category?.split(',')?.length > 0 ? category?.split(','):[category]:[];
 
-  if (!productList) {
-    res.status(500).json({ success: false });
+  const priceFilter = {};
+  if (min) priceFilter.$gte = Number(min);
+  if (max) priceFilter.$lte = Number(max);
+  const sortOrder =  sort === 'asc' ? 1 : sort === 'desc' ? -1 : null;
+  try {
+    
+    const pipeline = [
+      {
+        $lookup: {
+          from: 'subcategories', // Name of the SubCategory collection in your DB
+          localField: 'subCategory',
+          foreignField: '_id',
+          as: 'subCategoryInfo',
+        },
+      },
+      {
+        // Unwind subCategory but preserve documents even if subCategoryInfo is null
+        $unwind: {
+          path: '$subCategoryInfo',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $lookup: {
+          from: 'categories', // Name of the Category collection in your DB
+          localField: 'subCategoryInfo.category',
+          foreignField: '_id',
+          as: 'subCategoryInfo.categoryInfo',
+        },
+      },
+      {
+        // Unwind category but preserve documents even if categoryInfo is null
+        $unwind: {
+          path: '$subCategoryInfo.categoryInfo',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $match: categoryArray.length > 0 ? { 'subCategoryInfo.categoryInfo._id': { $in: categoryArray.map(id => mongoose.Types.ObjectId(id)) } } : {},
+      },
+      {
+        $match: Object.keys(priceFilter).length > 0 ? { price: priceFilter } : {},
+      }
+    ];
+    if (sortOrder !== null) {
+      pipeline.push({ $sort: { price: sortOrder } });
+    }
+
+    const productList = await Product.aggregate(pipeline);
+
+
+   
+
+    // Return the filtered product list
+    res.status(200).json(productList);
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
   }
-  res.status(200).json(productList);
 };
 export const updateProduct = async (req, res) => {
   if (!mongoose.isValidObjectId(req.params.id)) {

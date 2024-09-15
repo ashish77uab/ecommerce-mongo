@@ -23,6 +23,7 @@ const Product = () => {
         toast.error(<ToastMsg title={data.message} />);
       }
     } catch (error) {
+      console.log(error,'error')
       toast.error(<ToastMsg title={error?.response?.data?.message} />);
     }
   };
