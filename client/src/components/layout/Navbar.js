@@ -61,7 +61,7 @@ const Navbar = () => {
                       className="w-10 h-10 object-cover rounded-full"
                       src={
                         user.profileImage
-                          ? `${process.env.REACT_APP_DEV_API}${user.profileImage}`
+                          ? `${user.profileImage}`
                           : "/images/user.png"
                       }
                       alt=""

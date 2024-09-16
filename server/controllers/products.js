@@ -3,16 +3,20 @@ import SubCategory from "../models/SubCategory.js";
 import Product from "../models/Product.js";
 import fs from "fs";
 import mongoose from "mongoose";
+import { deleteFileFromCloudinary, uploadImageToCloudinary } from "../helpers/functions.js";
 export const createProduct = async (req, res) => {
   const category = await SubCategory.findById(req.body.subCategory);
   if (!category) return res.status(400).send("Invalid Category");
   const files = req.files;
-  if (!files) return res.status(400).json({ message: "No images uploaded" });
+  if (files?.length<1) return res.status(400).json({ message: "No images uploaded" });
   let imagesPaths = [];
-  if (files) {
-    files.map((file) => {
-      imagesPaths.push(file.filename);
+  let tempPath=[]
+  if (files?.length>0) {
+    files.forEach( async (file) => {
+      tempPath.push(uploadImageToCloudinary(file, res))
     });
+    const tempImagePaths = await Promise.all(tempPath)
+    imagesPaths = tempImagePaths.map((path) => path.url);
   }
   let product = new Product({
     ...req.body,
@@ -158,14 +162,18 @@ export const updateProduct = async (req, res) => {
   const oldImages = oldProduct.images;
   const files = req.files;
   let imagesPaths = [...oldImages];
-  if (files) {
+  if (files?.length>0) {
     let totalImages = files.length + oldImages.length;
     if (totalImages > 10) {
       res.status(500).json({ message: "Total 10 Images are allowed " });
     } else {
-      files.map((file) => {
-        imagesPaths.push(file.filename);
+      let tempPath = []
+      files.forEach(async (file) => {
+        tempPath.push(uploadImageToCloudinary(file, res))
       });
+      const tempImagePaths = await Promise.all(tempPath)
+      const allUploadedPaths = tempImagePaths.map((path) => path.url);
+      imagesPaths = imagesPaths.concat(allUploadedPaths);;
     }
   }
   let data = { ...req.body };
@@ -202,24 +210,35 @@ export const deleteProduct = async (req, res) => {
     });
 };
 export const deleteProductImage = async (req, res) => {
-  const imgPath = req.body.imgPath;
-  const oldProduct = await Product.findOne({ _id: req.params.id });
-  const oldImages = oldProduct.images;
-  const imagesPaths = oldImages.filter((file) => {
-    if (file === imgPath) {
-      fs.unlinkSync("./public/uploads/" + file);
-      return false;
-    } else {
-      return true;
-    }
-  });
-  const product = await Product.findByIdAndUpdate(
-    req.params.id,
-    {
-      images: imagesPaths,
-    },
-    { new: true }
-  );
-  if (!product) return res.status(500).send("The images cannot be deleted!");
-  res.status(200).json({ success: true });
+ try {
+  console.log(req?.body,req?.params,'req')
+   const imgPath = req.body.imgPath;
+   const oldProduct = await Product.findOne({ _id: req.params.id });
+   const oldImages = oldProduct.images;
+   const isDeleted = await deleteFileFromCloudinary(imgPath)
+   if (isDeleted) {
+     const imagesPaths = oldImages.filter((file) => {
+       if (file === imgPath) {
+         return false;
+       } else {
+         return true;
+       }
+     });
+     const product = await Product.findByIdAndUpdate(
+       req.params.id,
+       {
+         images: imagesPaths,
+       },
+       { new: true }
+     );
+     res.status(200).json({ success: true });
+   } else {
+     res.status(500).send("The image cannot be deleted by cloudinary!")
+   }
+  
+ } catch (error) {
+   res.status(500).send("Internal server error!")
+ }
+
+ 
 };

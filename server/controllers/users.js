@@ -6,6 +6,7 @@ import Token from "../models/Token.js";
 import crypto from "crypto";
 import { sendEmail } from "../SendEmail.js";
 import mongoose from "mongoose";
+import { deleteFileFromCloudinary, uploadImageToCloudinary } from "../helpers/functions.js";
 
 export const signin = async (req, res) => {
   const { email, password } = req.body;
@@ -70,22 +71,31 @@ export const uploadProfileImage = async (req, res) => {
   const { type, image } = req.body;
   const { id } = req.params;
   const OldUser = await User.findOne({ _id: id });
-  let fileName;
+  let oldFile, imageToSet,tempImage;
   if (type === "cover") {
-    fileName = OldUser.coverImage;
+    oldFile = OldUser.coverImage;
   } else {
-    fileName = OldUser.profileImage;
+    oldFile = OldUser.profileImage;
   }
 
   try {
-    if (fileName) {
-      fs.unlinkSync("./public/uploads" + fileName);
+    if(oldFile){
+      const isDeleted = await deleteFileFromCloudinary(oldFile)
+      if (isDeleted) {
+        const fileFromCloudinary = await uploadImageToCloudinary(req.file, res)
+        tempImage = fileFromCloudinary?.url;
+      }else{
+        res.status(500).json({ message: "Something went wrong while deleting previous image" });
+      }
+    }else{
+      const fileFromCloudinary = await uploadImageToCloudinary(req.file, res)
+      tempImage = fileFromCloudinary?.url;
     }
-    let imageToSet;
+   
     if (type === "cover") {
-      imageToSet = { coverImage: image };
+      imageToSet = { coverImage: tempImage };
     } else {
-      imageToSet = { profileImage: image };
+      imageToSet = { profileImage: tempImage };
     }
     const newUser = await User.findByIdAndUpdate(
       { _id: id },
@@ -93,7 +103,7 @@ export const uploadProfileImage = async (req, res) => {
       { new: true }
     );
 
-    res.status(200).json({ newUser });
+    res.status(200).json(newUser);
   } catch (error) {
     res.status(500).json({ message: "Something went wrong" });
     console.log(error);

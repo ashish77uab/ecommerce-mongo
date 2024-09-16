@@ -18,29 +18,22 @@ const Profile = () => {
         setIsLoading(true);
         const formData = new FormData();
         formData.append("file", e.target.files[0]);
+        formData.append("type", type);
         try {
-            const uploadRes = await uploadImage(formData);
-            const { status } = uploadRes;
+            const res = await uploadProfileImage(user._id, formData);
+            const { status, data } = res;
+            console.log(res,'res')
             if (status >= 200 && status < 300) {
-                const res = await uploadProfileImage(user._id, {
-                    type,
-                    image: uploadRes.data,
-                });
-                const { status, data } = res;
-                if (status >= 200 && status < 300) {
-                    toast.success(<ToastMsg title={"Image uploaded successfully"} />);
-                    let UpdateImg;
-                    if (type === "cover") {
-                        UpdateImg = { coverImage: uploadRes.data };
-                    } else {
-                        UpdateImg = { profileImage: uploadRes.data };
-                    }
-                    dispatch(updateUser(UpdateImg));
+                toast.success(<ToastMsg title={"Image uploaded successfully"} />);
+                let UpdateImg;
+                if (type === "cover") {
+                    UpdateImg = { coverImage: data.coverImage };
                 } else {
-                    toast.error(<ToastMsg title={data.message} />);
+                    UpdateImg = { profileImage: data.profileImage };
                 }
+                dispatch(updateUser(UpdateImg));
             } else {
-                toast.error(<ToastMsg title={uploadRes.data.message} />);
+                toast.error(<ToastMsg title={data.message} />);
             }
         } catch (error) {
             toast.error(<ToastMsg title={error?.response?.data?.message} />);
@@ -93,7 +86,7 @@ const Profile = () => {
                                 className="w-full h-full rounded-full object-cover"
                                 src={
                                     user?.profileImage
-                                        ? `${process.env.REACT_APP_DEV_API}${user?.profileImage}`
+                                        ? `${user?.profileImage}`
                                         : "/images/user.png"
                                 }
                                 alt=""
