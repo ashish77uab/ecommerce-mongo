@@ -22,7 +22,7 @@ const DashboardLayout = () => {
         </Link>
         <div className="flex gap-2 items-center">
           <div className="flex gap-2 items-center">
-            <span className="font-semibold text-base">{user?.fullName}</span>
+            <span className="font-semibold text-2xl">{user?.fullName}</span>
             <div className="w-12 h-12 rounded-full cursor-pointer bg-amber-200 flex-center">
               <span className="text-18   font-semibold capitalize">{user?.fullName?.[0]}</span>
             </div>
