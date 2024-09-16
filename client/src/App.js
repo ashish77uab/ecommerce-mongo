@@ -19,6 +19,8 @@ import {
   ResetPassword,
   SubCategory,
   WishlistDetail,
+  Profile,
+  Orders,
 } from "./pages";
 import { getUser } from "./api/api";
 import { useDispatch } from "react-redux";
@@ -60,18 +62,21 @@ function App() {
             <Route path="/wishlist" element={<WishlistDetail />} />
             <Route path="/products" element={<AllProducts />} />
             <Route path="/orders" element={<OrderDetailsPage />} />
+            <Route path="/profile/:userId" element={<Profile />} />
           </Route>
           <Route path="/dashboard" element={<DashboardLayout />}>
             <Route index element={<Dashboard />} />
             <Route path="categories" element={<Category />} />
             <Route path="categories/:id" element={<SubCategory />} />
             <Route path="products" element={<Product />} />
+            <Route path="orders" element={<Orders />} />
             <Route path="products/add" element={<AddProduct />} />
             <Route path="products/update/:productId" element={<AddProduct />} />
           </Route>
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
+          
           <Route path="/passwordReset" element={<ResetPassword />} />
         </Routes>
       </BrowserRouter>

@@ -9,9 +9,7 @@ const Navbar = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const user = useSelector((state) => state.auth.user);
-  const cartLength = user?.carts?.filter(
-    (item) => item.isPlaced === false
-  )?.length;
+  const cartLength = user?.carts?.length;
   const wishlistLength = user?.whislistItems?.length;
   const handleLogout = () => {
     dispatch(setLogout());
@@ -97,7 +95,7 @@ const Navbar = () => {
                             </button>
                           )}
                         </Menu.Item>
-                        <Menu.Item>
+                      {user?.role==='Admin' &&   <Menu.Item>
                           {({ active }) => (
                             <button
                               onClick={() => navigate(`/dashboard`)}
@@ -111,6 +109,7 @@ const Navbar = () => {
                             </button>
                           )}
                         </Menu.Item>
+                        }
                         <Menu.Item>
                           {({ active }) => (
                             <button

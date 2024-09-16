@@ -26,7 +26,15 @@ export const updateCategory = (id, formData) =>
 // wishlist
 export const addToWishList = (formData) => API.post("wishlist/add", formData);
 export const getWishlistItem = () => API.get("wishlist");
-export const removeWishlistItem = (id) => API.delete(`/wishlist/${id}`);
+export const removeWishlistItem = (id) => API.delete(`wishlist/${id}`);
+
+// orders
+export const removeCartItem = (id) => API.delete(`orders/remove-item/${id}`);
+export const updateOrderStatus = (data) => API.put(`orders`,data);
+  // admin
+export const getAllOrderList = (data) => API.get(`orders/admin/all?page=${data?.page}&limit=${data?.limit}`);
+
+
 // Products
 export const getProducts = (data) => API.get(`products?min=${data?.min||''}&max=${data?.max||''}&category=${data?.category||[]}&sort=${data?.sort||''}`);
 export const getBrands = () => API.get("products/brands");
@@ -40,7 +48,7 @@ export const deleteProductImage = (id, formData) =>
 export const addToCart = (formData) => API.post("orders/add-to-cart", formData);
 export const getCartItems = () => API.get("orders/cart-items");
 export const placeOrder = (formData) => API.post("orders", formData);
-export const getAllUserOrders = (id) => API.get(`orders/user-orders/${id}`);
+export const getAllUserOrders = () => API.get(`orders/user-orders`);
 
 // Sub Category
 export const addSubCategory = (formData) =>
@@ -65,6 +73,7 @@ export const forgotRequest = (formData) =>
   API.post(`auth/requestResetPassword`, formData);
 export const resetPassword = (formData) =>
   API.post(`auth/resetPassword`, formData);
+export const getUser = () => API.get("auth/profile");
 export const uploadProfileImage = (id, formData) =>
   API.post(`auth/profileImage/${id}`, formData);
-export const getUser = () => API.get("auth/profile");
+export const uploadImage = (formData) => API.post("upload", formData);

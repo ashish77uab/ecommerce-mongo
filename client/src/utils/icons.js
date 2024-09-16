@@ -38,6 +38,7 @@ import {
   AiOutlineStar,
   AiOutlineUnorderedList,
 } from "react-icons/ai";
+import { MdOutlineInventory } from "react-icons/md";
 export const reactIcons = {
   plus: <BsPlusLg />,
   minus: <AiOutlineMinus />,
@@ -76,5 +77,6 @@ export const reactIcons = {
   vault: <BsWallet2 />,
   product: <BsFillBoxFill />,
   cart:<BsCartCheck/>,
-  emptyCart:<BsCartX/>
+  emptyCart:<BsCartX/>,
+  inventory: <MdOutlineInventory/>
 };

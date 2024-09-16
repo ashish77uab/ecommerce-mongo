@@ -9,6 +9,7 @@ import { reactIcons } from "../utils/icons";
 import StarRating from "../components/forms/StarRating";
 import { useDispatch, useSelector } from "react-redux";
 import { setUserWishList, updateUserCarts } from "../redux/features/authSlice";
+import { getUserToken } from "../utils/constants";
 const ProductDetail = () => {
   const dispatch = useDispatch();
   const [active, setActive] = useState(0);
@@ -18,6 +19,7 @@ const ProductDetail = () => {
   const user = useSelector((state) => state.auth.user);
   const [gotoCart, setGoToCart] = useState(false);
   const [wishListAdded, setWishListAdded] = useState(false);
+  const isLoggedIn = getUserToken()
   const getProduct = async (id) => {
     try {
       const res = await getSingleProduct(id);
@@ -33,8 +35,13 @@ const ProductDetail = () => {
   };
 
   useEffect(() => {
-    if (user) {
+    if (id) {
       getProduct(id);
+    }
+  }, [id]);
+
+  useEffect(()=>{
+    if(user){
       user?.carts?.forEach((item) => {
         if (String(item.product) === String(id) && item.isPlaced === false) {
           setGoToCart(true);
@@ -46,7 +53,8 @@ const ProductDetail = () => {
         }
       });
     }
-  }, [id, user]);
+   
+  },[user])
 
   const handleQuantity = (type) => {
     if (type === "inc") {
@@ -56,17 +64,16 @@ const ProductDetail = () => {
     }
   };
   const handleAddToCart = async () => {
+    if (!isLoggedIn){
+      toast.error(<ToastMsg title={'Login first to add to cart'} />);
+      return
+    }
     try {
       const res = await addToCart({ product: id, quantity: quantity });
       const { status, data } = res;
       if (status >= 200 && status <= 300) {
         dispatch(
-          updateUserCarts({
-            product: id,
-            quantity: quantity,
-            user: user._id,
-            isPlaced: false,
-          })
+          updateUserCarts(data)
         );
         toast.success(<ToastMsg title={"Added Successfully"} />);
       } else {
@@ -77,6 +84,10 @@ const ProductDetail = () => {
     }
   };
   const handleAddToWishList = async () => {
+    if (!isLoggedIn) {
+      toast.error(<ToastMsg title={'Login first to add to wishlist'} />);
+      return
+    }
     try {
       const res = await addToWishList({ product: id });
       const { status, data } = res;

@@ -5,15 +5,45 @@ import User from "../models/User.js";
 import Token from "../models/Token.js";
 import crypto from "crypto";
 import { sendEmail } from "../SendEmail.js";
+import mongoose from "mongoose";
 
 export const signin = async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    const oldUser = await User.findOne({ email }).populate({
-      path: "carts",
-      select: "product",
-    });
+    const userData = await User.aggregate([
+      {
+        $match: { email: email }, // Find the user by email
+      },
+      {
+        $lookup: {
+          from: "orderitems", // Name of the collection you're joining (OrderItem collection)
+          let: { userId: "$_id" },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    { $eq: ["$user", "$$userId"] },
+                    { $eq: ["$isPlaced", false] } // Only include items where isPlaced is false
+                  ],
+                },
+              },
+            },
+          ],
+          as: "carts", // The name of the field in the result
+        },
+      },
+      {
+        $lookup: {
+          from: "wishlistitems", // Name of the collection you're joining
+          localField: "_id",
+          foreignField: "user",
+          as: "whislistItems",
+        },
+      },
+    ]);
+    const oldUser = userData?.[0]
     if (!oldUser)
       return res.status(404).json({ message: "User doesn't exist" });
 
@@ -23,7 +53,7 @@ export const signin = async (req, res) => {
       return res.status(400).json({ message: "Invalid Password" });
 
     const token = jwt.sign(
-      { email: oldUser.email, id: oldUser._id },
+      { email: oldUser.email, id: oldUser._id,role: oldUser.role},
       process.env.JWTSECRET,
       {
         expiresIn: "1d",
@@ -127,12 +157,59 @@ export const googleSignIn = async (req, res) => {
   }
 };
 export const getUser = async (req, res) => {
-  const user = req.user;
-  const userData = await User.findById(user.id, { password: 0 })
-    .populate("carts")
-    .populate("whislistItems");
-  res.status(200).json(userData);
+  try {
+    const user = req.user;
+    const userData = await User.aggregate([
+      {
+        $match: { _id: mongoose.Types.ObjectId(user.id) },
+      },
+      {
+        $lookup: {
+          from: "orderitems", // Name of the collection you're joining (OrderItem collection)
+          let: { userId: "$_id" },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    { $eq: ["$user", "$$userId"] },
+                    { $eq: ["$isPlaced", false] } // Only include items where isPlaced is false
+                  ],
+                },
+              },
+            },
+          ],
+          as: "carts",
+        },
+      },
+      {
+        $lookup: {
+          from: "wishlistitems", // Name of the collection you're joining
+          localField: "_id",
+          foreignField: "user",
+          as: "whislistItems",
+        },
+      },
+      {
+        $project: {
+          password: 0, // Exclude the password field
+        },
+      },
+    ]);
+
+    res.status(200).json(userData[0] || {}); // Send the first (and likely only) result back
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server Error" });
+  }
 };
+// export const getUser = async (req, res) => {
+//   const user = req.user;
+//   const userData = await User.findById(user.id, { password: 0 })
+//     .populate("carts")
+//     .populate("whislistItems");
+//   res.status(200).json(userData);
+// };
 export const getUsers = async (req, res) => {
   const users = await User.find({});
   res.status(200).json(users);
@@ -143,7 +220,9 @@ export const resetPasswordRequestController = async (req, res) => {
   if (!user) res.status(404).json({ message: "Email does not exist" });
 
   let token = await Token.findOne({ userId: user._id });
-  if (token) await token.deleteOne();
+  if (token) {
+    await token.deleteOne();
+  }
 
   let resetToken = crypto.randomBytes(32).toString("hex");
   const hash = await bcrypt.hash(resetToken, Number(process.env.BCRYPT_SALT));

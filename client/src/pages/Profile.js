@@ -5,16 +5,52 @@ import { toast } from "react-toastify";
 import ToastMsg from "../components/toast/ToastMsg";
 import { reactIcons } from "../utils/icons";
 import Spinner from "../components/loaders/Spinner";
+import { uploadImage, uploadProfileImage } from "../api/api";
+import { updateUser } from "../redux/features/authSlice";
+import { imageRender } from "../utils/helpers";
 
 
 const Profile = () => {
     const [isLoading, setIsLoading] = useState(false);
     const dispatch = useDispatch();
     const user = useSelector((state) => state.auth.user);
+    const handleUploadProfileImage = async (e, type) => {
+        setIsLoading(true);
+        const formData = new FormData();
+        formData.append("file", e.target.files[0]);
+        try {
+            const uploadRes = await uploadImage(formData);
+            const { status } = uploadRes;
+            if (status >= 200 && status < 300) {
+                const res = await uploadProfileImage(user._id, {
+                    type,
+                    image: uploadRes.data,
+                });
+                const { status, data } = res;
+                if (status >= 200 && status < 300) {
+                    toast.success(<ToastMsg title={"Image uploaded successfully"} />);
+                    let UpdateImg;
+                    if (type === "cover") {
+                        UpdateImg = { coverImage: uploadRes.data };
+                    } else {
+                        UpdateImg = { profileImage: uploadRes.data };
+                    }
+                    dispatch(updateUser(UpdateImg));
+                } else {
+                    toast.error(<ToastMsg title={data.message} />);
+                }
+            } else {
+                toast.error(<ToastMsg title={uploadRes.data.message} />);
+            }
+        } catch (error) {
+            toast.error(<ToastMsg title={error?.response?.data?.message} />);
+        } finally {
+            setIsLoading(false);
+        }
+    };
     
 
-    useEffect(() => {
-    }, []);
+   
 
     return (
         <>
@@ -24,11 +60,17 @@ const Profile = () => {
                 <div className="container relative">
                     <div className="relative">
                         <div className=" h-96 rounded-lg overflow-hidden">
-                        <div className="flex-center w-full h-full bg-zinc-300">
-                                    <h6 className="heading-4">
-                                        Add your cover Image
-                                    </h6>
+                            {user?.coverImage ? (
+                                <img
+                                    className=" hoverable-img w-full"
+                                    src={imageRender(user?.coverImage)}
+                                    alt="cover"
+                                />
+                            ) : (
+                                <div className="flex-center w-full h-full bg-zinc-300">
+                                    <h6 className="heading-4">Add your cover Image</h6>
                                 </div>
+                            )}
                         </div>
                         <label
                             htmlFor="cover"
@@ -40,6 +82,7 @@ const Profile = () => {
                                 name=""
                                 id="cover"
                                 hidden
+                                onChange={(e) => handleUploadProfileImage(e, "cover")}
                             
                             />
                         </label>
@@ -65,6 +108,7 @@ const Profile = () => {
                                     name=""
                                     id="profile"
                                     hidden
+                                    onChange={(e) => handleUploadProfileImage(e, "profile")}
                                 
                                 />
                             </label>

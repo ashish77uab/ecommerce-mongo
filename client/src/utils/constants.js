@@ -15,6 +15,11 @@ export const links = [
     title: "Products",
     icon: reactIcons.product,
   },
+  {
+    path: "orders",
+    title: "Orders",
+    icon: reactIcons.inventory,
+  },
 ];
 export const colorsOptions=[
     '#c4b5fd',
@@ -33,3 +38,8 @@ export const sortBy=[
     { id: 3, value:'asc', name: 'Low to high',  },
       
 ]
+
+
+export const getUserToken=()=>{
+  return localStorage.getItem("ashishToken")
+}

@@ -1,10 +1,19 @@
-import React, { useState } from "react";
-import { Link, NavLink, Outlet } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
 import { reactIcons } from "../../utils/icons";
 import { links } from "./../../utils/constants";
+import { useSelector } from "react-redux";
 
 const DashboardLayout = () => {
   const [sideBarOpen, setSidebarOpen] = useState(true);
+  const user = useSelector((state) => state.auth.user);
+  const navigate=useNavigate()
+ useEffect(()=>{
+   if(user?.role!=='Admin'){
+    navigate(-1)
+   }
+ },[user])
+
   return (
     <div className="flex h-screen w-full flex-col overflow-hidden">
       <div className="sticky flex-shrink-0 z-50 top-0  h-[70px] flex justify-between gap-6 items-center px-8 border-b border-b-zinc-200">
@@ -13,9 +22,9 @@ const DashboardLayout = () => {
         </Link>
         <div className="flex gap-2 items-center">
           <div className="flex gap-2 items-center">
-            <span className="font-semibold text-base">Admin Patel</span>
+            <span className="font-semibold text-base">{user?.fullName}</span>
             <div className="w-12 h-12 rounded-full cursor-pointer bg-amber-200 flex-center">
-              <span className="text-18   font-semibold capitalize">A</span>
+              <span className="text-18   font-semibold capitalize">{user?.fullName?.[0]}</span>
             </div>
           </div>
         </div>

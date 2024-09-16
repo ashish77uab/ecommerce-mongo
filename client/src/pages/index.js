@@ -8,6 +8,7 @@ import AllSubCategory from "./AllSubCategory";
 import ProductDetail from "./ProductDetail";
 import Category from "./dashboard/Category";
 import Dashboard from "./dashboard/Dashboard";
+import Orders from "./dashboard/Orders";
 import Product from "./dashboard/Product";
 import SubCategory from "./dashboard/SubCategory";
 import AddProduct from "./dashboard/AddProduct";
@@ -34,4 +35,5 @@ export {
   AllProducts,
   WishlistDetail,
   OrderDetailsPage,
+  Orders
 };

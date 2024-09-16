@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { getCartItems, placeOrder } from "../api/api";
+import { getCartItems, placeOrder, removeCartItem } from "../api/api";
 import ToastMsg from "../components/toast/ToastMsg";
 import { toast } from "react-toastify";
 import { imageRender, numberWithCommas } from "../utils/helpers";
 import TextInput from "../components/forms/TextInput";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { updateWholeCarts } from "../redux/features/authSlice";
 import RenderNoData from "../components/layout/RenderNoData";
@@ -18,6 +18,7 @@ const initialState = {
   phone: "",
 };
 const CartDetail = () => {
+  const navigate = useNavigate();
   const user = useSelector((state) => state.auth.user);
   const dispatch = useDispatch();
   const [cartData, setCartData] = useState([]);
@@ -56,11 +57,30 @@ const CartDetail = () => {
       if (status >= 200 && status <= 300) {
         toast.success(<ToastMsg title={"Order placed successfully"} />);
         dispatch(
-          updateWholeCarts(
-            user?.carts.map((item) => ({ ...item, isPlaced: true }))
+          updateWholeCarts([]
           )
         );
         handleReset();
+        getcartData()
+        navigate('/orders')
+      } else {
+        toast.error(<ToastMsg title={data.message} />);
+      }
+    } catch (error) {
+      toast.error(<ToastMsg title={error?.response?.data?.message} />);
+    }
+  };
+  const handleRemoveCartItem = async (id) => {
+    try {
+      const res = await removeCartItem(id);
+      const { status, data } = res;
+      if (status >= 200 && status <= 300) {
+        toast.success(<ToastMsg title={"Removed from your cart"} />);
+        dispatch(
+          updateWholeCarts(user?.carts.filter((item) => item._id !== id))
+        );
+        getcartData()
+       
       } else {
         toast.error(<ToastMsg title={data.message} />);
       }
@@ -79,9 +99,9 @@ const CartDetail = () => {
           <div className="border-c col-span-3 rounded-md ">
             <ul>
               {cartData.length > 0 ? (
-                cartData.map(({ product, quantity }) => (
-                  <Link
-                    to={`/product/${product._id}`}
+                cartData.map(({ product, quantity, _id }) => (
+                  <div
+                    onClick={() => navigate(`/product/${product._id}`)}
                     key={product._id}
                     className="flex items-center hover:bg-amber-100 gap-6 py-4 px-6 border-b border-b-zinc-200"
                   >
@@ -92,7 +112,7 @@ const CartDetail = () => {
                         alt={product?.title}
                       />
                     </div>
-                    <div>
+                    <div className="flex-grow">
                       <h3 className="heading-6">{product?.name}</h3>
                       <p className="text-muted font-bold">
                         Rs. {numberWithCommas(product?.price)}
@@ -105,7 +125,16 @@ const CartDetail = () => {
                         <span className="font-medium">{quantity}</span>
                       </p>
                     </div>
-                  </Link>
+                    <button
+                      onClick={(e) => {
+                        handleRemoveCartItem(_id);
+                        e.stopPropagation();
+                      }}
+                      className="btn-outline-primary"
+                    >
+                      Remove
+                    </button>
+                  </div>
                 ))
               ) : (
                 <li>

@@ -47,7 +47,7 @@ const AllSubCategory = () => {
             ))
           ) : (
             <RenderNoData
-              title={"No data available"}
+              title={"No sub category found"}
               className={"col-span-full"}
             />
           ) }
