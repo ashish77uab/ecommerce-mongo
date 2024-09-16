@@ -7,17 +7,21 @@ import {
   getAllUserOrders,
   getOrdersCount,
   getTotalSales,
+  removeCartItem,
   updateOrder,
+  getAllOrdersAdmin
 } from "../controllers/orders.js";
 import { authenticateJWT } from "../middleware/auth.js";
 const router = express.Router();
 router.post(`/add-to-cart`, authenticateJWT, addToCart);
+router.delete(`/remove-item/:id`, authenticateJWT, removeCartItem);
 router.get(`/cart-items`, authenticateJWT, getAllCartItem);
 router.get(`/all`, authenticateJWT, getAllOrders);
 router.get("/totalsales", authenticateJWT, getTotalSales);
 router.get(`/count`, authenticateJWT, getOrdersCount);
-router.get(`/user-orders/:userid`, authenticateJWT, getAllUserOrders);
+router.get(`/user-orders`, authenticateJWT, getAllUserOrders);
 router.post("/", authenticateJWT, createOrder);
-router.put("/:id", authenticateJWT, updateOrder);
+router.put("/", authenticateJWT, updateOrder);
+router.get("/admin/all", authenticateJWT, getAllOrdersAdmin);
 
 export default router;
