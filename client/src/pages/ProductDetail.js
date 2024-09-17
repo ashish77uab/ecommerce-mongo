@@ -120,9 +120,9 @@ const ProductDetail = () => {
         :
         <div className="py-4">
           <div className="container">
-            <div className="flex gap-10">
+            <div className="flex md:flex-row flex-col gap-10">
               <div className="relative max-w-[600px] w-full bg-zinc-100 ">
-                <div className="w-full  h-[600px] rounded-md overflow-hidden bg-zinc-300">
+                <div className="w-full md:h-[450px] h-[350px]  lg:h-[600px] rounded-md overflow-hidden bg-zinc-300">
                   <img
                     className="w-full h-full object-contain hoverable-img"
                     src={imageRender(product?.images?.[active])}
