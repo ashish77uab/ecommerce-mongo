@@ -5,8 +5,8 @@ const Spinner = () => {
   return (
     <>
       {createPortal(
-        <div className="fixed inset-0 flex-center drop-shadow-md bg-black bg-opacity-30 z-[1000]">
-          <BeatLoader color="#ffffff" size={20} />
+        <div className="fixed inset-0 flex-center drop-shadow-md bg-gray-50 bg-opacity-0 z-[1000]">
+          <BeatLoader color="#d97706" size={20} />
         </div>,
         document.getElementById("modals")
       )}

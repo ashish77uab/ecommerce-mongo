@@ -13,10 +13,11 @@ const WishlistDetail = () => {
   const navigate = useNavigate();
   const user = useSelector((state) => state.auth.user);
   const dispatch = useDispatch();
-  const [wishlistData, setWishlistData] = useState([]);
+  const [wishlistData, setWishlistData] = useState(null);
   const [loading, setLoading] = useState(false);
-
+  const [fetchLoading, setFetchLoading] = useState(false);
   const getWishlistData = async () => {
+    setFetchLoading(true)
     try {
       const res = await getWishlistItem();
       const { status, data } = res;
@@ -27,6 +28,8 @@ const WishlistDetail = () => {
       }
     } catch (error) {
       toast.error(<ToastMsg title={error?.response?.data?.message} />);
+    }finally{
+      setFetchLoading(false)
     }
   };
   const handleRemoveWishlist = async (id) => {
@@ -56,13 +59,13 @@ const WishlistDetail = () => {
 
   return (
     <div className="py-6">
-      {loading && <Spinner />}
+      {loading || fetchLoading || !wishlistData ? <Spinner /> :
       <div className="container">
         <div className="grid grid-cols-1  gap-10">
           <div className="border-c col-span-3 rounded-md  max-w-8xl w-full mx-auto">
             <ul>
-              {wishlistData.length > 0 ? (
-                wishlistData.map(({ product, _id }) => (
+              {wishlistData?.length > 0 ? (
+                wishlistData?.map(({ product, _id }) => (
                   <div
                     onClick={() => navigate(`/product/${product._id}`)}
                     key={product._id}
@@ -101,6 +104,7 @@ const WishlistDetail = () => {
           </div>
         </div>
       </div>
+}
     </div>
   );
 };

@@ -8,13 +8,16 @@ import { imageRender, numberWithCommas } from "../utils/helpers";
 import { useNavigate } from "react-router-dom";
 import {  useSelector } from "react-redux";
 import RenderNoData from "../components/layout/RenderNoData";
+import Spinner from "../components/loaders/Spinner";
 
 const WishlistDetail = () => {
   const navigate = useNavigate();
   const user = useSelector((state) => state.auth.user);
-  const [orders, setOrders] = useState([]);
+  const [orders, setOrders] = useState(null);
+  const [fetchLoading, setFetchLoading] = useState(false);
 
   const getOrderDetailsData = async (id) => {
+    setFetchLoading(true)
     try {
       const res = await getAllUserOrders(id);
       const { status, data } = res;
@@ -25,6 +28,8 @@ const WishlistDetail = () => {
       }
     } catch (error) {
       toast.error(<ToastMsg title={error?.response?.data?.message} />);
+    }finally{
+      setFetchLoading(false)
     }
   };
   
@@ -36,11 +41,12 @@ const WishlistDetail = () => {
   }, [user]);
   return (
     <div className="py-6">
+      { fetchLoading || !orders ? <Spinner /> :
       <div className="container">
         <div className="grid grid-cols-1  gap-10">
           <div className="border-c col-span-3 rounded-md  max-w-8xl w-full mx-auto">
             <ul className="flex flex-col gap-4">
-              {orders.length > 0 ? (
+              {orders?.length > 0 ? (
                 orders?.map((order, orderIndex) => (
                   <li
                     key={order._id}
@@ -114,6 +120,7 @@ const WishlistDetail = () => {
           </div>
         </div>
       </div>
+      }
     </div>
   );
 };
