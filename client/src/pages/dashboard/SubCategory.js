@@ -19,8 +19,11 @@ const SubCategory = () => {
   const [subCategory, setSubCategory] = useState(null);
   const [isConfirmedOpen, setIsConfirmedOpen] = useState(false);
   const isClosed = isAddNewCatOpen === false;
-  const [subCategories, setSubCategories] = useState([]);
+  const [subCategories, setSubCategories] = useState(null);
+  const [fetchLoading, setFetchLoading] = useState(false);
+
   const getAllSubCategoriesData = async () => {
+    setFetchLoading(true)
     try {
       const res = await getAllSubCategories({ id: id });
       const { status, data } = res;
@@ -31,6 +34,8 @@ const SubCategory = () => {
       }
     } catch (error) {
       toast.error(<ToastMsg title={error?.response?.data?.message} />);
+    }finally{
+      setFetchLoading(false)
     }
   };
 
@@ -84,7 +89,7 @@ const SubCategory = () => {
                 </tr>
               </thead>
               <tbody>
-                {subCategories.map((subCategory, index) => (
+                {subCategories?.map((subCategory, index) => (
                   <tr>
                     <td className="w-[80px]">{index + 1}</td>
                     <td>{subCategory.name}</td>
@@ -123,7 +128,7 @@ const SubCategory = () => {
                     </td>
                   </tr>
                 ))}
-                {subCategories?.length < 1 && <RenderNoData title={'No Categories available'} />}
+                {subCategories?.length < 1 && !fetchLoading && <RenderNoData title={'No Categories available'} />}
               </tbody>
             </table>
           </div>

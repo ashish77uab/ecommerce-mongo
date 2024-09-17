@@ -44,6 +44,7 @@
   tbody {
     display: block;
     overflow: auto;
+    min-height: 500px;
   }
   svg {
     color: inherit;
@@ -54,6 +55,7 @@
     display: table;
     width: 100%;
     table-layout: fixed;
+  
   }
   th {
     @apply py-4 px-2 text-base  font-semibold first:text-left first:pl-4 text-black bg-amber-200 last:rounded-tr-[8px] first:rounded-tl-[8px];
