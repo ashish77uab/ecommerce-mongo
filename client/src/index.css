@@ -67,7 +67,7 @@
 }
 @layer components {
   .heading-3 {
-    @apply text-4xl font-semibold;
+    @apply text-xl md:text-4xl font-semibold;
   }
   .heading-4 {
     @apply text-2xl font-semibold;

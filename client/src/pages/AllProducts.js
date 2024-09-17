@@ -82,8 +82,8 @@ const AllProducts = () => {
     }, [selectedSort])
     return (
         <section>
-            <div className="container flex gap-8 py-10 items-start">
-                <div className="w-80  border-c flex-shrink-0 rounded-md ">
+            <div className="container  flex md:flex-row flex-col  md:gap-8 gap-10 py-10 items-start">
+                <div className="lg:w-80 w-60  border-c flex-shrink-0 rounded-md ">
                     <header className="py-4 px-4 border-b border-b-zinc-200 mb-2">
                         <h4 className="heading-4">Filter By</h4>
                     </header>
@@ -183,7 +183,7 @@ const AllProducts = () => {
                             </Listbox>
                         </div>
                     </header>
-                    <div className="grid grid-cols-3 gap-4">
+                    <div className="grid md:grid-cols-1 grid-cols-1 lg:grid-cols-3 gap-4">
                         {skeletonLoading
                             ? Array(12)
                                   .fill(2)

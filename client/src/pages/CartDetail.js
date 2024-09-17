@@ -122,8 +122,8 @@ const CartDetail = () => {
     <div className="py-6">
       {loading && <Spinner />}
       <div className="container">
-        <div className={`grid grid-cols-5  gap-10 `}>
-          <div className={` ${cartData?.length < 1 && 'col-span-5'} border-c col-span-3 rounded-md`}>
+        <div className={`grid grid-cols-1 lg:grid-cols-5  gap-10 `}>
+          <div className={` ${cartData?.length < 1 && 'col-span-full'} border-c col-span-3 rounded-md`}>
             <ul>
               
               {cartData?.length > 0 ? (
