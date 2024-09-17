@@ -60,7 +60,7 @@ const Home = () => {
           <h4 className="heading-3">Top Categories</h4>
           <Link className="flex items-center gap-2 btn-outline-primary px-4" to='/categories'>View All Categories <span>{reactIcons.arrowright}</span></Link>
         </header>
-        <div className="grid md:grid-cols-3 grid-cols-1 lg:grid-cols-4 gap-4">
+        <div className="grid md:grid-cols-2 grid-cols-1 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {skeletonLoading ? (
             < >
               {Array(4)
@@ -79,7 +79,7 @@ const Home = () => {
           <h4 className="heading-3">Featured Products</h4>
           <Link className="flex items-center gap-2 btn-outline-primary px-4" to='/products'>View All Products <span>{reactIcons.arrowright}</span></Link>
         </header>
-        <div className="grid md:grid-cols-3 grid-cols-1 lg:grid-cols-4 gap-4">
+        <div className="grid md:grid-cols-2 grid-cols-1 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {skeletonLoading ? (
             <>
               {Array(4)

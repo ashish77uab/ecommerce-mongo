@@ -84,7 +84,7 @@
     @apply absolute top-1/2 -translate-y-1/2;
   }
   .btn {
-    @apply px-10 py-2 font-semibold font-gabrito text-base rounded-md disabled:opacity-60 disabled:cursor-not-allowed;
+    @apply px-10 py-2 font-semibold font-gabrito text-[12px] md:text-base rounded-md disabled:opacity-60 disabled:cursor-not-allowed;
   }
   .btn-sm {
     @apply text-sm px-6 font-medium py-2;

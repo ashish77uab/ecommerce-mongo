@@ -39,7 +39,7 @@ const AllCategories = () => {
             navigate(-1)
           }}>{reactIcons.goback}</span> All categories</h4>
         </header>
-        <div className="grid grid-cols-4 gap-4">
+        <div className="grid md:grid-cols-2 grid-cols-1 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           { skeletonLoading? Array(12)
                                   .fill(2)
                                   .map((_item, index) => (

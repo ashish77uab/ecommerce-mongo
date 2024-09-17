@@ -83,7 +83,7 @@ const AllProducts = () => {
     return (
         <section>
             <div className="container  flex md:flex-row flex-col  md:gap-8 gap-10 py-10 items-start">
-                <div className="lg:w-80 w-60  border-c flex-shrink-0 rounded-md ">
+                <div className="lg:w-80 md:w-60 w-full  border-c flex-shrink-0 rounded-md ">
                     <header className="py-4 px-4 border-b border-b-zinc-200 mb-2">
                         <h4 className="heading-4">Filter By</h4>
                     </header>
