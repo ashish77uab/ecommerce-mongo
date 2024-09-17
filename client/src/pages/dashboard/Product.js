@@ -14,8 +14,10 @@ const Product = () => {
     const[productId,setProductId]=useState(null)
   const [isConfirmedOpen, setIsConfirmedOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [products, setProducts] = useState([]);
+  const [fetchLoading, setFetchLoading] = useState(false);
+  const [products, setProducts] = useState(null);
   const getAllProducts = async () => {
+    setFetchLoading(true)
     try {
       const res = await getProducts();
       const { status, data } = res;
@@ -27,6 +29,8 @@ const Product = () => {
     } catch (error) {
       console.log(error,'error')
       toast.error(<ToastMsg title={error?.response?.data?.message} />);
+    }finally{
+      setFetchLoading(false)
     }
   };
   useEffect(() => {
@@ -75,7 +79,7 @@ const Product = () => {
                 </tr>
               </thead>
               <tbody>
-                {  products.map((product, index) => (
+                {  products?.map((product, index) => (
                   <tr>
                     <td className="w-[80px]">{index + 1}</td>
                     <td>{product.name}</td>
@@ -120,7 +124,8 @@ const Product = () => {
                     </td>
                   </tr>
                 ))}
-                {products?.length < 1 && <RenderNoData title={'No products available'}/>}
+                {products?.length < 1 && !fetchLoading && <RenderNoData title={'No products available'}/>}
+                {fetchLoading && <div className="py-8 text-center font-semibold">Loading please wait....</div>}
                 
               </tbody>
             </table>

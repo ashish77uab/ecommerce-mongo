@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { deleteCategory, getAllOrderList } from "../../api/api";
+import {  getAllOrderList } from "../../api/api";
 import { toast } from "react-toastify";
 import ToastMsg from "../../components/toast/ToastMsg";
-import { imageRender, numberWithCommas } from "../../utils/helpers";
+import {  numberWithCommas } from "../../utils/helpers";
 import { reactIcons } from "../../utils/icons";
 import DeleteButton from "../../components/button/DeleteButton";
-import DeleteConfirmation from "../../components/modals/DeleteConfirmation";
-import { Link } from "react-router-dom";
 import Pagination from "../../components/Pagination";
 import UpdateOrderStatus from "../../components/modals/UpdateOrderStatus";
 import RenderNoData from "../../components/layout/RenderNoData";
@@ -14,10 +12,13 @@ import RenderNoData from "../../components/layout/RenderNoData";
 const Orders = () => {
   const limit = 10
   const [isConfirmedOpen, setIsConfirmedOpen] = useState(false);
-  const [orders, setOrders] = useState([]);
+  const [orders, setOrders] = useState(null);
   const [page, setPage] = useState(1);
   const [formData,setFormData] = useState({})
+  const [fetchLoading, setFetchLoading] = useState(false);
+
   const getAllOrders = async () => {
+    setFetchLoading(true)
     try {
       const res = await getAllOrderList({ limit, page });
       const { status, data } = res;
@@ -28,6 +29,8 @@ const Orders = () => {
       }
     } catch (error) {
       toast.error(<ToastMsg title={error?.response?.data?.message} />);
+    }finally{
+      setFetchLoading(false)
     }
   };
   const handlePageClick = ({ selected }) => {
@@ -96,7 +99,8 @@ const Orders = () => {
                     </td>
                   </tr>
                 ))}
-                {orders?.orders?.length < 1 && <RenderNoData title="No orders found." />}
+                {orders?.orders?.length < 1  && !fetchLoading && <RenderNoData title="No orders found." />}
+                {fetchLoading && <div className="py-8 text-center font-semibold">Loading please wait....</div>}
               </tbody>
             </table>
           </div>

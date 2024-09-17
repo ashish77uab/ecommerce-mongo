@@ -10,6 +10,7 @@ import AddCategory from "../../components/modals/AddCategory";
 import DeleteConfirmation from "../../components/modals/DeleteConfirmation";
 import { Link } from "react-router-dom";
 import RenderNoData from "../../components/layout/RenderNoData";
+import Spinner from "../../components/loaders/Spinner";
 
 const Category = () => {
   const [isAddNewCatOpen, setIsAddNewCatOpen] = useState(false);
@@ -17,8 +18,10 @@ const Category = () => {
   const [isConfirmedOpen, setIsConfirmedOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const isClosed = isAddNewCatOpen === false;
-  const [categories, setCategories] = useState([]);
+  const [fetchLoading, setFetchLoading] = useState(false);
+  const [categories, setCategories] = useState(null);
   const getAllCategories = async () => {
+    setFetchLoading(true)
     try {
       const res = await getCategories();
       const { status, data } = res;
@@ -29,6 +32,8 @@ const Category = () => {
       }
     } catch (error) {
       toast.error(<ToastMsg title={error?.response?.data?.message} />);
+    }finally{
+      setFetchLoading(false)
     }
   };
   useEffect(() => {
@@ -79,7 +84,7 @@ const Category = () => {
                 </tr>
               </thead>
               <tbody>
-                {categories.map((category, index) => (
+                {categories?.map((category, index) => (
                   <tr>
                     <td className="w-[80px]">{index + 1}</td>
                     <td>{category.name}</td>
@@ -127,7 +132,8 @@ const Category = () => {
                     </td>
                   </tr>
                 ))}
-                {categories?.length < 1 && <RenderNoData title={'No Categories available'} />}
+                {categories?.length < 1 && !fetchLoading  && <RenderNoData  title={'No Categories available'} />}
+                { fetchLoading && <div className="py-8 text-center font-semibold">Loading please wait....</div> }
               </tbody>
             </table>
           </div>
