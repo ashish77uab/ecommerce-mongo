@@ -8,6 +8,7 @@ import ProductCardSkeleton from "../components/cards/ProductCardSkeleton";
 import CategoryCardSkeleton from "../components/cards/CategoryCardSkeleton";
 import { reactIcons } from "../utils/icons";
 import { Link } from "react-router-dom";
+import RenderNoData from "../components/layout/RenderNoData";
 
 const Home = () => {
   const [categories, setCategories] = useState([]);
@@ -53,41 +54,43 @@ const Home = () => {
     })();
   }, []);
   return (
-    <section className=" pt-4 pb-20 space-y-4">
+    <section className=" pt-8 pb-20 space-y-4">
       <div className="container">
-        <header className="py-4">
+        <header className="py-4 flex justify-between gap-4  mb-4">
           <h4 className="heading-3">Top Categories</h4>
+          <Link className="flex items-center gap-2 btn-outline-primary px-4" to='/categories'>View All Categories <span>{reactIcons.arrowright}</span></Link>
         </header>
-        <div className="">
+        <div className="grid grid-cols-4 gap-4">
           {skeletonLoading ? (
-            <div className="grid grid-cols-4 gap-4">
+            < >
               {Array(4)
                 .fill(2)
                 .map((_item, index) => (
                   <CategoryCardSkeleton key={index} />
                 ))}
-            </div>
+            </>
           ) : (
-            <CategoriesSwiper data={categories} />
+              categories?.length> 0 ?    <CategoriesSwiper data={categories} /> :<RenderNoData title={'No categories available'}/>
           )}
         </div>
       </div>
       <div className="container">
-        <header className="py-4 flex justify-between gap-4 px-8">
+        <header className="py-4 flex justify-between gap-4  mb-4">
           <h4 className="heading-3">Featured Products</h4>
           <Link className="flex items-center gap-2 btn-outline-primary px-4" to='/products'>View All Products <span>{reactIcons.arrowright}</span></Link>
         </header>
-        <div className="">
+        <div className="grid grid-cols-4 gap-4">
           {skeletonLoading ? (
-            <div className="grid grid-cols-4 gap-4">
+            <>
               {Array(4)
                 .fill(2)
                 .map((_item, index) => (
                   <ProductCardSkeleton key={index} />
                 ))}
-            </div>
+            </>
           ) : (
-            <FeaturedSwiper data={featuredProducts} />
+              featuredProducts?.length > 0 ? <FeaturedSwiper data={featuredProducts} /> :<RenderNoData title={'No featured products available'}/>
+            
           )}
         </div>
       </div>

@@ -7,12 +7,14 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { updateWishList } from "../redux/features/authSlice";
 import RenderNoData from "../components/layout/RenderNoData";
+import Spinner from "../components/loaders/Spinner";
 
 const WishlistDetail = () => {
   const navigate = useNavigate();
   const user = useSelector((state) => state.auth.user);
   const dispatch = useDispatch();
   const [wishlistData, setWishlistData] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const getWishlistData = async () => {
     try {
@@ -28,6 +30,7 @@ const WishlistDetail = () => {
     }
   };
   const handleRemoveWishlist = async (id) => {
+    setLoading(true)
     try {
       const res = await removeWishlistItem(id);
       const { status, data } = res;
@@ -42,6 +45,8 @@ const WishlistDetail = () => {
       }
     } catch (error) {
       toast.error(<ToastMsg title={error?.response?.data?.message} />);
+    }finally{
+      setLoading(false)
     }
   };
 
@@ -51,9 +56,10 @@ const WishlistDetail = () => {
 
   return (
     <div className="py-6">
+      {loading && <Spinner />}
       <div className="container">
         <div className="grid grid-cols-1  gap-10">
-          <div className="border-c col-span-3 rounded-md  max-w-3xl w-full mx-auto">
+          <div className="border-c col-span-3 rounded-md  max-w-8xl w-full mx-auto">
             <ul>
               {wishlistData.length > 0 ? (
                 wishlistData.map(({ product, _id }) => (

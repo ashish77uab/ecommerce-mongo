@@ -9,6 +9,7 @@ import DeleteConfirmation from "../../components/modals/DeleteConfirmation";
 import { Link } from "react-router-dom";
 import Pagination from "../../components/Pagination";
 import UpdateOrderStatus from "../../components/modals/UpdateOrderStatus";
+import RenderNoData from "../../components/layout/RenderNoData";
 
 const Orders = () => {
   const limit = 10
@@ -95,6 +96,7 @@ const Orders = () => {
                     </td>
                   </tr>
                 ))}
+                {orders?.orders?.length < 1 && <RenderNoData title="No orders found." />}
               </tbody>
             </table>
           </div>

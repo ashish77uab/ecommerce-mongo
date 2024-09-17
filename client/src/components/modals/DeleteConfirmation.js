@@ -2,7 +2,7 @@ import React from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { Fragment } from "react";
 
-const DeleteConfirmation = ({ isOpen, closeModal, handleDelete, title }) => {
+const DeleteConfirmation = ({ isOpen, closeModal, handleDelete, title, loading }) => {
   return (
     <Transition appear show={isOpen} as={Fragment}>
       <Dialog as="div" className="relative z-10" onClose={closeModal}>
@@ -39,7 +39,7 @@ const DeleteConfirmation = ({ isOpen, closeModal, handleDelete, title }) => {
 
                 <div className="mt-4 flex justify-center gap-6 items-center">
                   <button onClick={handleDelete} className="btn-primary">
-                    Yes
+                    {loading? 'Deleting...':  'Yes'}
                   </button>
                   <button onClick={closeModal} className="btn-red">
                     No

@@ -8,9 +8,14 @@ import { reactIcons } from "../utils/icons";
 import { Listbox, Transition } from "@headlessui/react";
 import { sortBy } from "../utils/constants";
 import TextInput from "../components/forms/TextInput";
+import { useSearchParams } from "react-router-dom";
 
 const AllProducts = () => {
+    const [searchParams]=useSearchParams()
+    const category=searchParams.get('category')
+    const initialCategory = category ? [category]:[]
     const [categories, setCategories] = useState([]);
+    console.log(categories)
     const [priceFilter, setPriceFilter] = useState({
         min:'',
         max:''
@@ -18,7 +23,7 @@ const AllProducts = () => {
     const [products, setProducts] = useState([]);
     const [skeletonLoading, setSkeletonLoading] = useState(true);
     const [selectedSort, setSelectedSort] = useState(sortBy[0]);
-    const [selectedCategory, setSelectedCategory] = useState([]);
+    const [selectedCategory, setSelectedCategory] = useState(initialCategory);
     const handleApplyFilter=()=>{
         getAllProducts({ category: selectedCategory, min: priceFilter?.min, max: priceFilter?.max, sort: selectedSort?.value });
     }

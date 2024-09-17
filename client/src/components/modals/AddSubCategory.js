@@ -16,6 +16,7 @@ import FileUpload from "../forms/FileUpload";
 import { imageRender } from "../../utils/helpers";
 
 const AddSubCategory = ({ isOpen, closeModal, subCategory, id }) => {
+  const [loading, setLoading] = useState(false)
   const initialState = {
     name: "",
     color: colorsOptions[0],
@@ -36,6 +37,7 @@ const AddSubCategory = ({ isOpen, closeModal, subCategory, id }) => {
   };
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true)
     const formData = new FormData();
 
     if (subCategory) {
@@ -69,6 +71,8 @@ const AddSubCategory = ({ isOpen, closeModal, subCategory, id }) => {
     } catch (error) {
       console.log(error, "error");
       toast.error(<ToastMsg title={error?.response?.data?.message} />);
+    }finally{
+      setLoading(false)
     }
   };
   useEffect(() => {
@@ -179,7 +183,7 @@ const AddSubCategory = ({ isOpen, closeModal, subCategory, id }) => {
 
                 <div className="mt-4">
                   <button className="btn-primary">
-                    {subCategory ? "Update" : "Add"}
+                    {loading? 'Loading...'  :  subCategory ? "Update" : "Add"}
                   </button>
                 </div>
               </Dialog.Panel>

@@ -16,6 +16,7 @@ const initialState = {
   icon: "",
 };
 const AddCategory = ({ isOpen, closeModal, category }) => {
+  const [loading,setLoading] = useState(false)
   const [form, setForm] = useState(initialState);
   const [image, setImage] = useState(null);
   const handleChange = (e) => {
@@ -29,6 +30,7 @@ const AddCategory = ({ isOpen, closeModal, category }) => {
   };
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true)
     const formData = new FormData();
 
     if (category) {
@@ -62,6 +64,8 @@ const AddCategory = ({ isOpen, closeModal, category }) => {
     } catch (error) {
       console.log(error, "error");
       toast.error(<ToastMsg title={error?.response?.data?.message} />);
+    } finally {
+      setLoading(false)
     }
   };
   useEffect(() => {
@@ -166,7 +170,7 @@ const AddCategory = ({ isOpen, closeModal, category }) => {
 
                 <div className="mt-4">
                   <button className="btn-primary">
-                    {category ? "Update" : "Add"}
+                    {loading?'Loading...' :  category ? "Update" : "Add"}
                   </button>
                 </div>
               </Dialog.Panel>

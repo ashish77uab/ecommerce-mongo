@@ -9,8 +9,10 @@ import DeleteButton from "../../components/button/DeleteButton";
 import DeleteConfirmation from "../../components/modals/DeleteConfirmation";
 import { useLocation, useParams } from "react-router-dom";
 import AddSubCategory from "../../components/modals/AddSubCategory";
+import RenderNoData from "../../components/layout/RenderNoData";
 
 const SubCategory = () => {
+  const [loading,setLoading]=useState(false)
   const location = useLocation();
   const { id } = useParams();
   const [isAddNewCatOpen, setIsAddNewCatOpen] = useState(false);
@@ -37,6 +39,7 @@ const SubCategory = () => {
   }, [isClosed]);
 
   const handleDelete = async () => {
+    setLoading(true)
     try {
       const res = await deleteSubCategory(subCategory._id);
       const { status, data } = res;
@@ -49,6 +52,8 @@ const SubCategory = () => {
       }
     } catch (error) {
       toast.error(<ToastMsg title={error?.response?.data?.message} />);
+    }finally{
+      setLoading(false)
     }
   };
   return (
@@ -118,6 +123,7 @@ const SubCategory = () => {
                     </td>
                   </tr>
                 ))}
+                {subCategories?.length < 1 && <RenderNoData title={'No Categories available'} />}
               </tbody>
             </table>
           </div>
@@ -137,6 +143,7 @@ const SubCategory = () => {
         closeModal={() => setIsConfirmedOpen(false)}
         handleDelete={handleDelete}
         title={"sub category"}
+        loading={loading}
       />
     </>
   );

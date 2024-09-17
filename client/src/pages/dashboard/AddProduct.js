@@ -23,6 +23,8 @@ const AddProduct = () => {
     const { productId } = useParams();
     const navigate = useNavigate();
     const [form, setForm] = useState(initialState);
+    const [loading, setLoading] = useState(false);
+    const [deleteLoading, setDeleteLoading] = useState(false);
     const [images, setImages] = useState([]);
     const [updateImages, setUpdateImages] = useState([]);
     const [categories, setCategories] = useState([]);
@@ -57,33 +59,50 @@ const AddProduct = () => {
         setForm(initialState);
         setImages(null);
     };
+    const areFieldsNotEmpty = (state) => {
+        for (const key in state) {
+            if (state.hasOwnProperty(key)) {
+                const value = state[key];
+
+                // Check if the value is empty, ignoring isFeatured since it's boolean
+                if (key !== 'isFeatured' && !value && value?.trim() === "") {
+                    return false;  // Return false if any field is empty
+                }
+            }
+        }
+        return true; // All fields are non-empty
+    };
     const handleSubmit = async (e) => {
         e.preventDefault();
+        const isValid = areFieldsNotEmpty(form);
+        if (!isValid) {
+            toast.error(<ToastMsg title="Please fill all required fields" />);
+            return;
+        }
+        setLoading(true)
         const formData = new FormData();
         for (const [key, value] of Object.entries(form)) {
             formData.append(key, value);
         }
-        if(productId){
-            if(updateImages&&updateImages.length>0){
+        if (productId) {
+            if (updateImages && updateImages.length > 0) {
                 updateImages.forEach((f) => {
                     formData.append("images", f);
                 });
             }
-        }else{
-            if(images.length>0){
+        } else {
+            if (images.length > 0) {
                 images.forEach((f) => {
                     formData.append("images", f);
                 });
             }
 
         }
-
-        
         try {
-            const res = productId? await updateProduct(productId,formData)  : await addProduct(formData);
+            const res = productId ? await updateProduct(productId, formData) : await addProduct(formData);
             const { status, data } = res;
             if (status >= 200 && status < 300) {
-                toast.success(<ToastMsg title={`${productId?'Updated' :'Added'} Successfully`} />);
+                toast.success(<ToastMsg title={`${productId ? 'Updated' : 'Added'} Successfully`} />);
                 handleReset();
                 navigate("/dashboard/products");
             } else {
@@ -92,6 +111,8 @@ const AddProduct = () => {
         } catch (error) {
             console.log(error, "error");
             toast.error(<ToastMsg title={error?.response?.data?.message} />);
+        } finally {
+            setLoading(false)
         }
     };
     const getProduct = async (id) => {
@@ -100,17 +121,17 @@ const AddProduct = () => {
             const { status, data } = res;
             if (status >= 200 && status <= 300) {
                 setForm({
-                    name:data.name,
-                    description:data.description,
-                    richDescription:data.richDescription,
-                    brand:data.brand,
-                    price:data.price,
-                    subCategory:data.subCategory?._id,
-                    countInStock:data.countInStock,
-                    isFeatured:data.isFeatured,
+                    name: data.name,
+                    description: data.description,
+                    richDescription: data.richDescription,
+                    brand: data.brand,
+                    price: data.price,
+                    subCategory: data.subCategory?._id,
+                    countInStock: data.countInStock,
+                    isFeatured: data.isFeatured,
                 });
                 setImages(data.images);
-                setSelect(categories?.find((item)=>item.value===data.subCategory?._id))
+                setSelect(categories?.find((item) => item.value === data.subCategory?._id))
             } else {
                 toast.error(<ToastMsg title={data.message} />);
             }
@@ -120,24 +141,27 @@ const AddProduct = () => {
         }
     };
     useEffect(() => {
-        if (productId&&categories.length>0) {
-             getProduct(productId);
+        if (productId && categories.length > 0) {
+            getProduct(productId);
         }
-    }, [productId,categories]);
+    }, [productId, categories]);
 
-    const handleRemoveImage= async (url)=>{
+    const handleRemoveImage = async (url) => {
+        setDeleteLoading(true)
         try {
-            const res = await deleteProductImage(productId,{imgPath:url});
+            const res = await deleteProductImage(productId, { imgPath: url });
             const { status, data } = res;
             if (status >= 200 && status < 300) {
                 toast.success(<ToastMsg title={`Deleted Successfully`} />);
-                setImages(images.filter(image=>image!==url))
+                setImages(images.filter(image => image !== url))
             } else {
                 toast.error(<ToastMsg title={data.message} />);
             }
         } catch (error) {
             console.log(error, "error");
             toast.error(<ToastMsg title={error?.response?.data?.message} />);
+        } finally {
+            setDeleteLoading(false)
         }
 
     }
@@ -175,21 +199,22 @@ const AddProduct = () => {
                     </div>
                     <div className="col-span-2">
                         <MultipleFileUpload
-                            setImages={productId ? setUpdateImages:setImages}
-                            images={productId?updateImages: images}
-                            productId={productId||null}
+                            setImages={productId ? setUpdateImages : setImages}
+                            images={productId ? updateImages : images}
+                            productId={productId || null}
                         />
                         <div className="flex gap-4  flex-wrap my-4">
-        { productId && images?.length>0 && (
-          images?.map((url ,index)=>(
-            <div   key={index} className="flex flex-col gap-1 relative bg-gray-300 p-1 rounded-md">
-                {/* <button type="button" onClick={()=>handleFrontImage(index)} className="text-2xl flex-center bg-pink-100 rounded-full w-8 h-8 text-red-500 absolute top-2 right-2">{ isFront===index? reactIcons.heartFill :  reactIcons.heartOutline}</button> */}
-                <button type="button" onClick={()=>handleRemoveImage(url)} className="text-xl flex-center bg-pink-100 rounded-full w-8 h-8 text-red-500 absolute left-2 top-2">{ reactIcons.delete}</button>
-                <img className="w-32 h-32 object-contain cursor-pointer" src={imageRender(url)} alt="" />
-            </div>
-          ))
-        )}
-      </div>
+                            {productId && images?.length > 0 && (
+                                images?.map((url, index) => (
+                                    <div key={index} className="flex flex-col gap-1 relative bg-gray-300 p-1 rounded-md">
+                                        {/* <button type="button" onClick={()=>handleFrontImage(index)} className="text-2xl flex-center bg-pink-100 rounded-full w-8 h-8 text-red-500 absolute top-2 right-2">{ isFront===index? reactIcons.heartFill :  reactIcons.heartOutline}</button> */}
+                                        <button type="button" onClick={() => handleRemoveImage(url)} className="text-xl flex-center bg-pink-100 rounded-full w-8 h-8 text-red-500 absolute left-2 top-2">{reactIcons.delete}</button>
+                                        <img className="w-32 h-32 object-contain cursor-pointer" src={imageRender(url)} alt="" />
+                                    </div>
+                                ))
+                            )}
+                        </div>
+                        {deleteLoading &&  <div className="text-red-600 py-2">Deleting please wait...</div>}
                     </div>
 
                     <TextInput
@@ -249,7 +274,7 @@ const AddProduct = () => {
                     </div>
                     <div className="col-span-2">
                         <button type="submit" className="btn-primary">
-                            {productId? 'Update'  :'Add'}
+                            {loading ? 'Loading...' : productId ? 'Update' : 'Add'}
                         </button>
                     </div>
                 </div>

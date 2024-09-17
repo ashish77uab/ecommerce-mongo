@@ -9,11 +9,13 @@ import DeleteButton from "../../components/button/DeleteButton";
 import AddCategory from "../../components/modals/AddCategory";
 import DeleteConfirmation from "../../components/modals/DeleteConfirmation";
 import { Link } from "react-router-dom";
+import RenderNoData from "../../components/layout/RenderNoData";
 
 const Category = () => {
   const [isAddNewCatOpen, setIsAddNewCatOpen] = useState(false);
   const [category, setCategory] = useState(null);
   const [isConfirmedOpen, setIsConfirmedOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
   const isClosed = isAddNewCatOpen === false;
   const [categories, setCategories] = useState([]);
   const getAllCategories = async () => {
@@ -33,6 +35,7 @@ const Category = () => {
     getAllCategories();
   }, [isClosed]);
   const handleDelete = async () => {
+    setLoading(true)
     try {
       const res = await deleteCategory(category._id);
       const { status, data } = res;
@@ -45,6 +48,8 @@ const Category = () => {
       }
     } catch (error) {
       toast.error(<ToastMsg title={error?.response?.data?.message} />);
+    }finally{
+      setLoading(false)
     }
   };
   return (
@@ -122,6 +127,7 @@ const Category = () => {
                     </td>
                   </tr>
                 ))}
+                {categories?.length < 1 && <RenderNoData title={'No Categories available'} />}
               </tbody>
             </table>
           </div>
@@ -140,6 +146,7 @@ const Category = () => {
         closeModal={() => setIsConfirmedOpen(false)}
         handleDelete={handleDelete}
         title={"category"}
+        loading={loading}
       />
     </>
   );

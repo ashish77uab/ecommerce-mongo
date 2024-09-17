@@ -16,6 +16,7 @@ import CartDetail from "./CartDetail";
 import AllProducts from "./AllProducts";
 import WishlistDetail from "./WishlistDetail";
 import OrderDetailsPage from "./OrderDetailsPage";
+import AllCategories from "./AllCategories";
 
 export {
   Login,
@@ -35,5 +36,6 @@ export {
   AllProducts,
   WishlistDetail,
   OrderDetailsPage,
-  Orders
+  Orders,
+  AllCategories
 };

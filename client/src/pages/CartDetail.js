@@ -8,8 +8,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { updateWholeCarts } from "../redux/features/authSlice";
 import RenderNoData from "../components/layout/RenderNoData";
+import Spinner from "../components/loaders/Spinner";
 const initialState = {
-  productsList: [],
   shippingAddress1: "",
   shippingAddress2: "",
   city: "",
@@ -24,6 +24,7 @@ const CartDetail = () => {
   const [cartData, setCartData] = useState([]);
   const [form, setForm] = useState(initialState);
   const [error, setError] = useState(initialState);
+  const [loading, setLoading] = useState(false);
   const handleReset = () => {
     setForm(initialState);
   };
@@ -31,6 +32,18 @@ const CartDetail = () => {
     const { name, value } = e.target;
     setForm({ ...form, [name]: value });
     setError({ ...error, [name]: "" });
+  };
+  const areFieldsNotEmpty = (state) => {
+    for (const key in state) {
+      if (state.hasOwnProperty(key)) {
+        const value = state[key];
+
+        if ( !value || value?.trim() === "") {
+          return false;  // Return false if any field is empty
+        }
+      }
+    }
+    return true; // All fields are non-empty
   };
   const getcartData = async () => {
     try {
@@ -47,6 +60,14 @@ const CartDetail = () => {
   };
   const handlePlaceOrder = async (e) => {
     e.preventDefault();
+    const isValid = areFieldsNotEmpty(form);
+    if (!isValid) {
+      toast.error(<ToastMsg title="Please fill all required fields" />);
+      return;
+    }
+   
+    setLoading(true)
+   
     try {
       let formData = {
         ...form,
@@ -68,9 +89,12 @@ const CartDetail = () => {
       }
     } catch (error) {
       toast.error(<ToastMsg title={error?.response?.data?.message} />);
+    }finally{
+      setLoading(false)
     }
   };
   const handleRemoveCartItem = async (id) => {
+    setLoading(true)
     try {
       const res = await removeCartItem(id);
       const { status, data } = res;
@@ -86,6 +110,8 @@ const CartDetail = () => {
       }
     } catch (error) {
       toast.error(<ToastMsg title={error?.response?.data?.message} />);
+    } finally{
+      setLoading(false)
     }
   };
   useEffect(() => {
@@ -94,11 +120,13 @@ const CartDetail = () => {
 
   return (
     <div className="py-6">
+      {loading && <Spinner />}
       <div className="container">
-        <div className="grid grid-cols-5  gap-10">
-          <div className="border-c col-span-3 rounded-md ">
+        <div className={`grid grid-cols-5  gap-10 `}>
+          <div className={` ${cartData?.length < 1 && 'col-span-5'} border-c col-span-3 rounded-md`}>
             <ul>
-              {cartData.length > 0 ? (
+              
+              {cartData?.length > 0 ? (
                 cartData.map(({ product, quantity, _id }) => (
                   <div
                     onClick={() => navigate(`/product/${product._id}`)}
@@ -143,7 +171,7 @@ const CartDetail = () => {
               )}
             </ul>
           </div>
-          <div className="border-c col-span-2 rounded-md ">
+          {cartData?.length > 0 &&  <div className="border-c col-span-2 rounded-md ">
             <form onSubmit={handlePlaceOrder} action="">
               <header className="py-4 border-b border-b-zinc-200 px-4">
                 <h4 className="heading-4 ">Enter shipping Details</h4>
@@ -208,7 +236,7 @@ const CartDetail = () => {
                 </button>
               </div>
             </form>
-          </div>
+          </div>}
         </div>
       </div>
     </div>

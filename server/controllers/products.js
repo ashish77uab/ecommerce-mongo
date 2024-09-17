@@ -192,26 +192,40 @@ export const updateProduct = async (req, res) => {
   res.status(201).json(product);
 };
 export const deleteProduct = async (req, res) => {
-  Product.findByIdAndRemove(req.params.id)
-    .then((product) => {
-      if (product) {
-        return res.status(200).json({
-          success: true,
-          message: "the product is deleted!",
-        });
-      } else {
-        return res
-          .status(404)
-          .json({ success: false, message: "product not found!" });
-      }
-    })
-    .catch((err) => {
-      return res.status(500).json({ success: false, error: err });
-    });
+  try {
+    const oldProduct = await Product.findOne({ _id: req.params.id });
+    const oldImages = oldProduct.images;
+    let tempPath = [];
+    if (oldImages?.length > 0) {
+      oldImages.forEach(async (url) => {
+        tempPath.push(deleteFileFromCloudinary(url, res))
+      });
+      const tempImagePaths = await Promise.all(tempPath)
+    }
+    Product.findByIdAndRemove(req.params.id)
+      .then((product) => {
+        if (product) {
+          return res.status(200).json({
+            success: true,
+            message: "the product is deleted!",
+          });
+        } else {
+          return res
+            .status(404)
+            .json({ success: false, message: "product not found!" });
+        }
+      })
+      .catch((err) => {
+        return res.status(500).json({ success: false, error: err });
+      });
+    
+  } catch (error) {
+    
+  }
+  
 };
 export const deleteProductImage = async (req, res) => {
  try {
-  console.log(req?.body,req?.params,'req')
    const imgPath = req.body.imgPath;
    const oldProduct = await Product.findOne({ _id: req.params.id });
    const oldImages = oldProduct.images;

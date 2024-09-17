@@ -21,6 +21,7 @@ import {
   WishlistDetail,
   Profile,
   Orders,
+  AllCategories,
 } from "./pages";
 import { getUser } from "./api/api";
 import { useDispatch } from "react-redux";
@@ -29,6 +30,7 @@ import ToastMsg from "./components/toast/ToastMsg";
 import { useEffect } from "react";
 import MainLayout from "./components/layout/MainLayout";
 import DashboardLayout from "./components/layout/DashboardLayout";
+import ProtectedRoutes from "./ProtectedRoutes";
 function App() {
   const dispatch = useDispatch();
   const getUserData = async () => {
@@ -58,11 +60,12 @@ function App() {
             <Route index element={<Home />} />
             <Route path="/category/:id" element={<AllSubCategory />} />
             <Route path="/product/:id" element={<ProductDetail />} />
-            <Route path="/cart" element={<CartDetail />} />
-            <Route path="/wishlist" element={<WishlistDetail />} />
+            <Route path="/cart" element={<ProtectedRoutes> <CartDetail /> </ProtectedRoutes>} />
+            <Route path="/wishlist" element={<ProtectedRoutes> <WishlistDetail /></ProtectedRoutes>} />
             <Route path="/products" element={<AllProducts />} />
-            <Route path="/orders" element={<OrderDetailsPage />} />
-            <Route path="/profile/:userId" element={<Profile />} />
+            <Route path="/categories" element={<AllCategories />} />
+            <Route path="/orders" element={<ProtectedRoutes> <OrderDetailsPage /></ProtectedRoutes>} />
+            <Route path="/profile/:userId" element={<ProtectedRoutes> <Profile /></ProtectedRoutes>} />
           </Route>
           <Route path="/dashboard" element={<DashboardLayout />}>
             <Route index element={<Dashboard />} />
@@ -76,7 +79,6 @@ function App() {
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
-          
           <Route path="/passwordReset" element={<ResetPassword />} />
         </Routes>
       </BrowserRouter>
