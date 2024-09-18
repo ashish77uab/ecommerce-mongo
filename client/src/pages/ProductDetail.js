@@ -11,6 +11,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setUserWishList, updateUserCarts } from "../redux/features/authSlice";
 import { getUserToken } from "../utils/constants";
 import Spinner from "../components/loaders/Spinner";
+import RenderNoData from "../components/layout/RenderNoData";
 const ProductDetail = () => {
   const dispatch = useDispatch();
   const [active, setActive] = useState(0);
@@ -201,7 +202,7 @@ const ProductDetail = () => {
                 <h4 className="heading-4">Reviews ({product?.reviews?.length})</h4>
               </div>
               <ul className=" space-y-2  divide-y-2 border border-zinc-200 rounded-md  py-4 ">
-                {product?.reviews?.map((review) => {
+                {product?.reviews?.length >0 ?  product?.reviews?.map((review) => {
                   return (
                     <li key={review._id} className="py-2 px-4">
                       <div className="flex gap-4 items-start">
@@ -221,7 +222,12 @@ const ProductDetail = () => {
 
                     </li>
                   )
-                })}
+                }) : 
+                <li  className="py-2 px-4">
+                    <p className="font-semibold">No reviews available</p>
+                 
+                </li>
+                }
               </ul>
             </div>
           </div>

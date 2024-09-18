@@ -74,6 +74,7 @@ export const getProduct = async (req, res) => {
         preserveNullAndEmptyArrays: true,
       },
     },
+    
     {
       $lookup: {
         from: "users", // Join with the User collection for review author
@@ -88,6 +89,7 @@ export const getProduct = async (req, res) => {
         preserveNullAndEmptyArrays: true,
       },
     },
+    
     {
       $group: {
         _id: "$_id", // Group back to the product document
@@ -103,7 +105,12 @@ export const getProduct = async (req, res) => {
       },
     },
   ]);
-  res.status(200).json(product[0]);
+  const result = product[0];
+  if (result.averageRating === null) {
+    result.reviews = [];
+  }
+  
+  res.status(200).json(result);
 };
 export const getFeaturedProduct = async (req, res) => {
   const product = await Product.find({ isFeatured: true }).populate(
