@@ -50,11 +50,11 @@ const WishlistDetail = () => {
                 orders?.map((order, orderIndex) => (
                   <li
                     key={order._id}
-                    className="py-4 px-4 flex flex-col gap-2"
+                    className="py-4 md:px-4 px-2 flex flex-col gap-2  border-b border-b-zinc-200"
                   >
                     <div className="flex justify-between items-center gap-2">
-                      <div className="font-semibold pb-2 text-lg">Order No {orderIndex + 1}</div>
-                      <div className="font-semibold pb-2 text-lg">Status:  <span className={`
+                      <div className="font-semibold pb-2 md:text-lg text-sm">Order No {orderIndex + 1}</div>
+                      <div className="font-semibold pb-2 md:text-lg text-sm">Status:  <span className={`
                       ${order?.status === 'Pending' && 'text-gray-600'}
                       ${order?.status === 'Processed' && 'text-yellow-500'}
                       ${order?.status === 'Delivered' && 'text-green-700'}
@@ -68,9 +68,9 @@ const WishlistDetail = () => {
                         <div
                           onClick={() => navigate(`/product/${product.product}`)}
                           key={product.product}
-                          className="flex items-center cursor-pointer hover:bg-amber-100 gap-6 py-4 px-6 border-b border-b-zinc-200"
+                          className="flex items-center cursor-pointer hover:bg-amber-100 gap-6  border-b border-b-zinc-200"
                         >
-                          <div className=" w-24 h-24 flex-shrink-0 rounded-md overflow-hidden bg-zinc-300">
+                          <div className=" md:w-24 md:h-24 w-16 h-16 flex-shrink-0 rounded-md overflow-hidden bg-zinc-300">
                             <img
                               className="w-full h-full object-contain hoverable-img"
                               src={imageRender(product?.productDetails?.images?.[0])}
@@ -78,11 +78,11 @@ const WishlistDetail = () => {
                             />
                           </div>
                           <div className="flex-1">
-                            <h3 className="heading-6">{product?.productDetails?.name}</h3>
-                            <p className="text-muted font-bold">
+                            <h3 className="md:heading-6 heading-7">{product?.productDetails?.name}</h3>
+                            <p className="text-muted font-bold md:text-base text-[11px]">
                               Rs. {numberWithCommas(product?.productDetails?.price)}
                             </p>
-                            <div>
+                            <div className="md:text-base text-[11px]">
                               <span className="mr-2">Quantity:</span>
                               <b>{product?.quantity}</b>
                             </div>
@@ -92,7 +92,7 @@ const WishlistDetail = () => {
                         </div>
                       ))
                     }
-                    <div className="flex items-start">
+                    <div className="flex items-start md:flex-row flex-col">
                       <div className="flex-grow">
                         <div className="font-semibold">Address:</div>
                        <div>{order?.shippingAddress1}</div>

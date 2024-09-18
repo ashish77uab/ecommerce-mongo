@@ -26,7 +26,7 @@ const Navbar = () => {
           </div>
           <div className="flex gap-2 items-center">
             {user && (
-              <div className="flex items-center gap-6">
+              <div className="flex items-center md:gap-6 gap-2">
                 <Link
                   to="/cart"
                   className="w-10 h-10 rounded-full text-xl bg-zinc-300 flex-center relative"
@@ -66,7 +66,7 @@ const Navbar = () => {
                       }
                       alt=""
                     />
-                    <span>{user?.fullName}</span>
+                    <span className="md:block hidden">{user?.fullName}</span>
                     <span className="ml-2">{reactIcons?.arrowDown}</span>
                   </Menu.Button>
 

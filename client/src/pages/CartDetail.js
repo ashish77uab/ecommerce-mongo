@@ -121,13 +121,24 @@ const CartDetail = () => {
   useEffect(() => {
     getcartData();
   }, []);
+  const renderButton = (_id)=>{
+    return <button
+      onClick={(e) => {
+        handleRemoveCartItem(_id);
+        e.stopPropagation();
+      }}
+      className="btn-outline-primary"
+    >
+      Remove
+    </button>
+  }
 
   return (
     <div className="py-6">
       {loading || fetchLoading || !cartData ? <Spinner /> :
         <div className="container">
-          <div className={`grid grid-cols-1 lg:grid-cols-5  gap-10 `}>
-            <div className={` ${cartData?.length < 1 && 'col-span-full'} border-c col-span-3 rounded-md`}>
+          <div className={`flex md:flex-row flex-col md:gap-8 gap-4 `}>
+            <div className={` ${cartData?.length < 1 && 'col-span-full'} border-c col-span-3 flex-grow rounded-md`}>
               <ul>
 
                 {cartData?.length > 0 ? (
@@ -135,9 +146,9 @@ const CartDetail = () => {
                     <div
                       onClick={() => navigate(`/product/${product._id}`)}
                       key={product._id}
-                      className="flex items-center hover:bg-amber-100 gap-6 py-4 px-6 border-b border-b-zinc-200"
+                      className="flex md:items-center items-start hover:bg-amber-100 md:gap-6 gap-4 md:py-4 py-3 md:px-6 px-2 border-b border-b-zinc-200"
                     >
-                      <div className=" w-24 h-24 flex-shrink-0 rounded-md overflow-hidden bg-zinc-300">
+                      <div className=" md:w-24 md:h-24 w-16 h-16 flex-shrink-0 rounded-md overflow-hidden bg-zinc-300">
                         <img
                           className="w-full h-full object-contain hoverable-img"
                           src={imageRender(product?.images?.[0])}
@@ -145,27 +156,24 @@ const CartDetail = () => {
                         />
                       </div>
                       <div className="flex-grow">
-                        <h3 className="heading-6">{product?.name}</h3>
-                        <p className="text-muted font-bold">
+                        <h3 className="md:heading-6 heading-7">{product?.name}</h3>
+                        <p className="text-muted font-bold md:text-base text-[11px]">
                           Rs. {numberWithCommas(product?.price)}
                         </p>
-                        <p>
+                        <p className="md:text-base text-[11px]">
                           {" "}
                           <strong className="font-semibold">
                             Quantity:
                           </strong>{" "}
                           <span className="font-medium">{quantity}</span>
                         </p>
+                        <div className="block md:hidden mt-1">
+                          {renderButton(_id)}
+                        </div>
                       </div>
-                      <button
-                        onClick={(e) => {
-                          handleRemoveCartItem(_id);
-                          e.stopPropagation();
-                        }}
-                        className="btn-outline-primary"
-                      >
-                        Remove
-                      </button>
+                      <div className="md:block hidden">
+                        {renderButton(_id)}
+                      </div>
                     </div>
                   ))
                 ) : (
@@ -175,8 +183,8 @@ const CartDetail = () => {
                 )}
               </ul>
             </div>
-            {cartData?.length > 0 && <div className="border-c col-span-2 rounded-md ">
-              <form onSubmit={handlePlaceOrder} action="">
+            {cartData?.length > 0 && <div className="border-c col-span-2 rounded-md md:w-[450px] w-full">
+              <form onSubmit={handlePlaceOrder} action="" className="w-full">
                 <header className="py-4 border-b border-b-zinc-200 px-4">
                   <h4 className="heading-4 ">Enter shipping Details</h4>
                 </header>

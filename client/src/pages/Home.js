@@ -26,6 +26,7 @@ const Home = () => {
     } catch (error) {
       toast.error(<ToastMsg title={error?.response?.data?.message} />);
     } finally {
+      setSkeletonLoading(false)
     }
   };
   const getAllFeaturedProducts = async () => {
@@ -40,18 +41,12 @@ const Home = () => {
     } catch (error) {
       toast.error(<ToastMsg title={error?.response?.data?.message} />);
     } finally {
+      setSkeletonLoading(false)
     }
   };
   useEffect(() => {
-    (async () => {
-      await Promise.all([getAllCategories(), getAllFeaturedProducts()])
-        .then((res) => {
-          setSkeletonLoading(false);
-        })
-        .catch((err) => {
-          setSkeletonLoading(false);
-        });
-    })();
+     getAllCategories()
+     getAllFeaturedProducts()
   }, []);
   return (
     <section className=" pt-8 pb-20 space-y-4">
@@ -60,7 +55,7 @@ const Home = () => {
           <h4 className="heading-3">Top Categories</h4>
           <Link className="flex items-center gap-2 btn-outline-primary px-4" to='/categories'>View All Categories <span>{reactIcons.arrowright}</span></Link>
         </header>
-        <div className="grid md:grid-cols-2 grid-cols-1 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        <div className="grid md:grid-cols-2 grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 md:gap-4 gap-1">
           {skeletonLoading ? (
             < >
               {Array(4)
@@ -79,7 +74,7 @@ const Home = () => {
           <h4 className="heading-3">Featured Products</h4>
           <Link className="flex items-center gap-2 btn-outline-primary px-4" to='/products'>View All Products <span>{reactIcons.arrowright}</span></Link>
         </header>
-        <div className="grid md:grid-cols-2 grid-cols-1 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        <div className="grid md:grid-cols-2 grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 md:gap-4 gap-1">
           {skeletonLoading ? (
             <>
               {Array(4)

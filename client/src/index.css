@@ -77,6 +77,9 @@
   .heading-6 {
     @apply text-lg font-semibold;
   }
+  .heading-7 {
+    @apply text-[13px] font-semibold;
+  }
   .flex-center {
     @apply flex justify-center items-center;
   }

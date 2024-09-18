@@ -36,11 +36,11 @@ const AllSubCategory = () => {
     <section className=" py-4 pb-10">
       <div className="container">
         <header className="py-4">
-          <h4 className="heading-3 flex items-center gap-1"> <span className="text-6xl" role="button" onClick={()=>{
+          <h4 className="heading-3 flex items-center gap-1"> <span className="md:text-4xl text-2xl" role="button" onClick={()=>{
             navigate(-1)
           }}>{reactIcons.goback}</span>  All sub categories</h4>
         </header>
-        <div className="grid md:grid-cols-3 grid-cols-1 lg:grid-cols-4 gap-4">
+        <div className="grid md:grid-cols-2 grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 md:gap-4 gap-1">
           { skeletonLoading? Array(12)
                                   .fill(2)
                                   .map((_item, index) => (

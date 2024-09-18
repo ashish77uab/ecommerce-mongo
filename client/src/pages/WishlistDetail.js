@@ -56,6 +56,17 @@ const WishlistDetail = () => {
   useEffect(() => {
     getWishlistData();
   }, []);
+  const renderButton = (_id) => {
+    return <button
+      onClick={(e) => {
+        handleRemoveWishlist(_id);
+        e.stopPropagation();
+      }}
+      className="btn-outline-primary"
+    >
+      Remove
+    </button>
+  }
 
   return (
     <div className="py-6">
@@ -69,9 +80,9 @@ const WishlistDetail = () => {
                   <div
                     onClick={() => navigate(`/product/${product._id}`)}
                     key={product._id}
-                    className="flex items-center cursor-pointer hover:bg-amber-100 gap-6 py-4 px-6 border-b border-b-zinc-200"
+                    className="flex md:items-center items-start hover:bg-amber-100 md:gap-6 gap-4 md:py-4 py-3 md:px-6 px-2 border-b border-b-zinc-200"
                   >
-                    <div className=" w-24 h-24 flex-shrink-0 rounded-md overflow-hidden bg-zinc-300">
+                    <div className=" md:w-24 md:h-24 w-16 h-16 flex-shrink-0 rounded-md overflow-hidden bg-zinc-300">
                       <img
                         className="w-full h-full object-contain hoverable-img"
                         src={imageRender(product?.images?.[0])}
@@ -83,16 +94,14 @@ const WishlistDetail = () => {
                       <p className="text-muted font-bold">
                         Rs. {numberWithCommas(product?.price)}
                       </p>
+                      <div className="block md:hidden mt-1">
+                        {renderButton(_id)}
+                      </div>
                     </div>
-                    <button
-                      onClick={(e) => {
-                        handleRemoveWishlist(_id);
-                        e.stopPropagation();
-                      }}
-                      className="btn-outline-primary"
-                    >
-                      Remove
-                    </button>
+                    <div className="md:block hidden">
+                      {renderButton(_id)}
+                    </div>
+                   
                   </div>
                 ))
               ) : (

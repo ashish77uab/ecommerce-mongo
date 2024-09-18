@@ -119,7 +119,7 @@ const AllProducts = () => {
                 <div className="flex-1 w-full">
                     <header className="mb-4 flex justify-between gap-8">
                         <h4 className="heading-3">All Products</h4>
-                        <div className="w-[250px]">
+                        <div className="md:w-[250px] min-w-[150px]">
                             <Listbox
                                 value={selectedSort}
                                 onChange={(value) => {
@@ -183,7 +183,7 @@ const AllProducts = () => {
                             </Listbox>
                         </div>
                     </header>
-                    <div className="grid md:grid-cols-1 grid-cols-1 lg:grid-cols-3 gap-4">
+                    <div className="grid md:grid-cols-1 grid-cols-2 lg:grid-cols-3 md:gap-4 gap-1">
                         {skeletonLoading
                             ? Array(12)
                                   .fill(2)
