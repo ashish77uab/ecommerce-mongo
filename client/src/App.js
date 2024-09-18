@@ -22,6 +22,8 @@ import {
   Profile,
   Orders,
   AllCategories,
+  Banners,
+  AddBanners,
 } from "./pages";
 import { getUser } from "./api/api";
 import { useDispatch } from "react-redux";
@@ -75,6 +77,9 @@ function App() {
             <Route path="orders" element={<Orders />} />
             <Route path="products/add" element={<AddProduct />} />
             <Route path="products/update/:productId" element={<AddProduct />} />
+            <Route path="banners" element={<Banners />} />
+            <Route path="banners/add" element={<AddBanners />} />
+            <Route path="banners/update/:bannerId" element={<AddBanners />} />
           </Route>
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/register" element={<Register />} />

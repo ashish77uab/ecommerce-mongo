@@ -20,6 +20,11 @@ export const links = [
     title: "Orders",
     icon: reactIcons.inventory,
   },
+  {
+    path: "banners",
+    title: "Banners",
+    icon: reactIcons.gallery,
+  },
 ];
 export const colorsOptions=[
     '#c4b5fd',
@@ -36,6 +41,17 @@ export const sortBy=[
     { id: 1, value:'', name: 'Sort By',  },
     { id: 2, value:'desc', name: 'High to low',  },
     { id: 3, value:'asc', name: 'Low to high',  },
+      
+]
+export const BANNERS_VALUE={
+  homeBanner:'Home homeBanner'
+}
+export const BANNERS_VALUES_ONLY={
+  homeBanner:'homeBanner'
+}
+export const bannerTypes=[
+    { id: 1, value:'', label: 'Select Banner Type',  },
+  { id: 2, value: BANNERS_VALUE.homeBanner, label: 'Home Banner',  },
       
 ]
 

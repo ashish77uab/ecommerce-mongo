@@ -17,6 +17,8 @@ import AllProducts from "./AllProducts";
 import WishlistDetail from "./WishlistDetail";
 import OrderDetailsPage from "./OrderDetailsPage";
 import AllCategories from "./AllCategories";
+import Banners from "./dashboard/Banners";
+import AddBanners from "./dashboard/AddBanners";
 
 export {
   Login,
@@ -37,5 +39,7 @@ export {
   WishlistDetail,
   OrderDetailsPage,
   Orders,
-  AllCategories
+  AllCategories,
+  Banners,
+  AddBanners,
 };

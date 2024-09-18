@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { getCategories, getFeaturedProducts } from "../api/api";
+import { getBanners, getCategories, getFeaturedProducts } from "../api/api";
 import { toast } from "react-toastify";
 import ToastMsg from "../components/toast/ToastMsg";
 import CategoriesSwiper from "../components/swipers/CategoriesSwiper";
@@ -9,11 +9,33 @@ import CategoryCardSkeleton from "../components/cards/CategoryCardSkeleton";
 import { reactIcons } from "../utils/icons";
 import { Link } from "react-router-dom";
 import RenderNoData from "../components/layout/RenderNoData";
+import { BANNERS_VALUES_ONLY } from "../utils/constants";
+import HomeBannerSlider from "../components/slider/HomeBannerSlider";
 
 const Home = () => {
   const [categories, setCategories] = useState([]);
   const [skeletonLoading, setSkeletonLoading] = useState(true);
   const [featuredProducts, setFeaturedProducts] = useState([]);
+  const [homeBanner, setHomeBanner] = useState(null);
+  const getAllBanners = async () => {
+    setSkeletonLoading(true)
+    try {
+      const res = await getBanners();
+      const { status, data } = res;
+      if (status >= 200 && status <= 300) {
+        let homeBanner = data?.find(item => item?.type === BANNERS_VALUES_ONLY.homeBanner)
+        setHomeBanner(homeBanner);
+      } else {
+        toast.error(<ToastMsg title={data.message} />);
+      }
+    } catch (error) {
+      console.log(error, 'error')
+      toast.error(<ToastMsg title={error?.response?.data?.message} />);
+    } finally {
+      setSkeletonLoading(false)
+    }
+  };
+
   const getAllCategories = async () => {
     try {
       const res = await getCategories();
@@ -47,9 +69,16 @@ const Home = () => {
   useEffect(() => {
      getAllCategories()
      getAllFeaturedProducts()
+     getAllBanners()
   }, []);
+  console.log(homeBanner)
   return (
     <section className=" pt-8 pb-20 space-y-4">
+      <div className="container">
+        <div className="relative">
+          <HomeBannerSlider data={homeBanner}/>
+        </div>
+      </div>
       <div className="container">
         <header className="py-4 flex justify-between gap-4  mb-4">
           <h4 className="heading-3">Top Categories</h4>

@@ -6,6 +6,7 @@ import userRoutes from "./routes/users.js";
 import categoryRoutes from "./routes/categories.js";
 import subCategoryRoutes from "./routes/subCategories.js";
 import productRoutes from "./routes/products.js";
+import bannerRoutes from "./routes/banner.js";
 import orderRoutes from "./routes/orders.js";
 import wishListRoutes from "./routes/wishlist.js";
 import upload from "./middleware/upload.js";
@@ -29,6 +30,7 @@ app.use("/auth", userRoutes);
 app.use("/categories", categoryRoutes);
 app.use("/sub-categories", subCategoryRoutes);
 app.use("/products", productRoutes);
+app.use("/banners", bannerRoutes);
 app.use("/orders", orderRoutes);
 app.use("/wishlist", wishListRoutes);
 app.post("/upload", upload.single("file"), (req, res) => {

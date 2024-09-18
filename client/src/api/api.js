@@ -14,9 +14,14 @@ API.interceptors.request.use((req) => {
   }
   return req;
 });
-
+// Banners
+export const getBanners = () => API.get("banners");
+export const updateBanner = (id, formData) =>
+  API.put(`banners/${id}`, formData);
+export const addBanner = (formData) => API.post("banners", formData);
+export const deleteBannerImage = (id, formData) =>
+  API.put(`banners/delete-banner-image/${id}`, formData);
 // Category API
-
 export const getCategories = () => API.get("categories");
 export const addCategory = (formData) => API.post("categories", formData);
 export const deleteCategory = (id) => API.delete(`categories/${id}`);
@@ -30,13 +35,13 @@ export const removeWishlistItem = (id) => API.delete(`wishlist/${id}`);
 
 // orders
 export const removeCartItem = (id) => API.delete(`orders/remove-item/${id}`);
-export const updateOrderStatus = (data) => API.put(`orders`,data);
-  // admin
+export const updateOrderStatus = (data) => API.put(`orders`, data);
+// admin
 export const getAllOrderList = (data) => API.get(`orders/admin/all?page=${data?.page}&limit=${data?.limit}`);
 
 
 // Products
-export const getProducts = (data) => API.get(`products?min=${data?.min||''}&max=${data?.max||''}&category=${data?.category||[]}&sort=${data?.sort||''}`);
+export const getProducts = (data) => API.get(`products?min=${data?.min || ''}&max=${data?.max || ''}&category=${data?.category || []}&sort=${data?.sort || ''}`);
 export const getBrands = () => API.get("products/brands");
 export const addProduct = (formData) => API.post("products", formData);
 export const deleteProduct = (id) => API.delete(`products/${id}`);

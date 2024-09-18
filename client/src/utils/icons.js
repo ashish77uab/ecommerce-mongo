@@ -1,5 +1,6 @@
 import React from "react";
 import { FiTrash2 } from "react-icons/fi";
+import { FaImage } from "react-icons/fa";
 import {
   BiDollarCircle,
   BiEditAlt,
@@ -78,5 +79,6 @@ export const reactIcons = {
   product: <BsFillBoxFill />,
   cart:<BsCartCheck/>,
   emptyCart:<BsCartX/>,
-  inventory: <MdOutlineInventory/>
+  inventory: <MdOutlineInventory/>,
+  gallery: <FaImage/>
 };
