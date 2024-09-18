@@ -80,57 +80,69 @@ export const updateOrder = async (req, res) => {
 export const getAllUserOrders = async (req, res) => {
   try {
     const userId = req.user.id;
-      const orders = await Order.aggregate([
-        {
-          $match: { user: mongoose.Types.ObjectId(userId) }, // Match orders for the user
+    const orders = await Order.aggregate([
+      {
+        $match: { user: mongoose.Types.ObjectId(userId) }, // Match orders for the user
+      },
+      {
+        $lookup: {
+          from: "orderitems", // Join with the OrderItem collection
+          localField: "productsList", // Field in Order that stores the OrderItem references
+          foreignField: "_id", // Field in OrderItem that we join on
+          as: "productsList", // Output the joined data as productsList
         },
-        {
-          $lookup: {
-            from: "orderitems", // Join with the OrderItem collection
-            localField: "productsList", // Field in Order that stores the OrderItem references
-            foreignField: "_id", // Field in OrderItem that we join on
-            as: "productsList", // Output the joined data as productsList
-          },
+      },
+      {
+        $unwind: "$productsList", // Deconstruct the productsList array
+      },
+      {
+        $match: { "productsList.isPlaced": true }, // Filter for OrderItems with isPlaced true
+      },
+      {
+        $lookup: {
+          from: "products", // Join with the Product collection
+          localField: "productsList.product", // Field in OrderItem that stores Product references
+          foreignField: "_id", // Field in Product that we join on
+          as: "productsList.productDetails", // Output the joined product data
         },
-        {
-          $unwind: "$productsList", // Deconstruct the productsList array
+      },
+      {
+        $unwind: "$productsList.productDetails", // Deconstruct the productDetails array
+      },
+      {
+        $lookup: {
+          from: "reviews", // Join with the Review collection
+          localField: "productsList.productDetails._id", // Product ID in the product details
+          foreignField: "product", // Product field in Review schema
+          as: "productsList.productDetails.reviews", // Output reviews for the product
         },
-        {
-          $match: { "productsList.isPlaced": true }, // Filter for OrderItems with isPlaced true
+      },
+      {
+        $addFields: {
+          "productsList.productDetails.averageRating": { $avg: "$productsList.productDetails.reviews.rating" }, // Calculate the average rating of the product
         },
-        {
-          $lookup: {
-            from: "products", // Join with the Product collection
-            localField: "productsList.product", // Field in OrderItem that stores Product references
-            foreignField: "_id", // Field in Product that we join on
-            as: "productsList.productDetails", // Output the joined product data
-          },
+      },
+      {
+        $group: {
+          _id: "$_id", // Group back to orders
+          productsList: { $push: "$productsList" }, // Rebuild the productsList array with product details and ratings
+          shippingAddress1: { $first: "$shippingAddress1" },
+          shippingAddress2: { $first: "$shippingAddress2" },
+          city: { $first: "$city" },
+          zip: { $first: "$zip" },
+          country: { $first: "$country" },
+          phone: { $first: "$phone" },
+          status: { $first: "$status" },
+          totalPrice: { $first: "$totalPrice" },
+          user: { $first: "$user" },
+          createdAt: { $first: "$createdAt" },
+          updatedAt: { $first: "$updatedAt" },
         },
-        {
-          $unwind: "$productsList.productDetails", // Deconstruct the productDetails array
-        },
-        {
-          $group: {
-            _id: "$_id", // Group back to orders
-            productsList: { $push: "$productsList" }, // Rebuild the productsList array with product details
-            shippingAddress1: { $first: "$shippingAddress1" },
-            shippingAddress2: { $first: "$shippingAddress2" },
-            city: { $first: "$city" },
-            zip: { $first: "$zip" },
-            country: { $first: "$country" },
-            phone: { $first: "$phone" },
-            status: { $first: "$status" },
-            totalPrice: { $first: "$totalPrice" },
-            user: { $first: "$user" },
-            createdAt: { $first: "$createdAt" },
-            updatedAt: { $first: "$updatedAt" },
-          },
-        },
-        {
-          $sort: { createdAt: -1 }, // Sort the results by createdAt (most recent orders first)
-        },
-       
-      ]);
+      },
+      {
+        $sort: { createdAt: -1 }, // Sort the results by createdAt (most recent orders first)
+      },
+    ]);
     res.status(200).json(orders);
 
     } catch (error) {

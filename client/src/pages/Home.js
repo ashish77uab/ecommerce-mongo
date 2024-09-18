@@ -71,7 +71,6 @@ const Home = () => {
      getAllFeaturedProducts()
      getAllBanners()
   }, []);
-  console.log(homeBanner)
   return (
     <section className=" pt-8 pb-20 space-y-4">
       <div className="container">

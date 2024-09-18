@@ -1,18 +1,29 @@
-import Category from "../models/Category.js";
 import SubCategory from "../models/SubCategory.js";
 import Product from "../models/Product.js";
-import fs from "fs";
 import mongoose from "mongoose";
 import { deleteFileFromCloudinary, uploadImageToCloudinary } from "../helpers/functions.js";
+import Review from "../models/Review.js";
+
+export const createReviewForProduct = async (req, res) => {
+  const user=req.user
+  let review = new Review({
+    ...req.body,
+    user:user?.id
+  });
+  review = await review.save();
+  if (!review)
+    return res.status(500).json({ message: "Unable to create review for this products" });
+  res.status(201).json(review);
+};
 export const createProduct = async (req, res) => {
   const category = await SubCategory.findById(req.body.subCategory);
   if (!category) return res.status(400).send("Invalid Category");
   const files = req.files;
-  if (files?.length<1) return res.status(400).json({ message: "No images uploaded" });
+  if (files?.length < 1) return res.status(400).json({ message: "No images uploaded" });
   let imagesPaths = [];
-  let tempPath=[]
-  if (files?.length>0) {
-    files.forEach( async (file) => {
+  let tempPath = []
+  if (files?.length > 0) {
+    files.forEach(async (file) => {
       tempPath.push(uploadImageToCloudinary(file, res))
     });
     const tempImagePaths = await Promise.all(tempPath)
@@ -30,12 +41,69 @@ export const createProduct = async (req, res) => {
   res.status(201).json(product);
 };
 export const getProduct = async (req, res) => {
-  const product = await Product.findById(req.params.id).populate("subCategory");
-
-  if (!product) {
-    res.status(500).json({ message: "Product not found" });
-  }
-  res.status(200).json(product);
+  const productId = mongoose.Types.ObjectId(req.params.id); // Convert id to ObjectId
+  const product = await Product.aggregate([
+    {
+      $match: { _id: productId }, // Match the product by its ID
+    },
+    {
+      $lookup: {
+        from: "subcategories", // Join with the SubCategory collection
+        localField: "subCategory",
+        foreignField: "_id",
+        as: "subCategory",
+      },
+    },
+    {
+      $unwind: {
+        path: "$subCategory", // Unwind the subCategory field
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    {
+      $lookup: {
+        from: "reviews", // Join with the Review collection
+        localField: "_id", // Product ID in Review schema
+        foreignField: "product", // Product field in Review schema
+        as: "reviews", // Output as reviews
+      },
+    },
+    {
+      $unwind: {
+        path: "$reviews", // Unwind reviews array if needed
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    {
+      $lookup: {
+        from: "users", // Join with the User collection for review author
+        localField: "reviews.user",
+        foreignField: "_id",
+        as: "reviews.userDetails", // Add user details to each review
+      },
+    },
+    {
+      $unwind: {
+        path: "$reviews.userDetails", // Unwind user details for each review
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    {
+      $group: {
+        _id: "$_id", // Group back to the product document
+        name: { $first: "$name" },
+        description: { $first: "$description" },
+        richDescription: { $first: "$richDescription" },
+        price: { $first: "$price" },
+        images: { $first: "$images" },
+        brand: { $first: "$brand" },
+        subCategory: { $first: "$subCategory" }, // Include subCategory data
+        reviews: { $push: "$reviews" }, // Collect all reviews
+        averageRating: { $avg: "$reviews.rating" },
+      },
+    },
+  ]);
+  res.status(200).json(product[0]);
 };
 export const getFeaturedProduct = async (req, res) => {
   const product = await Product.find({ isFeatured: true }).populate(
@@ -50,18 +118,18 @@ export const getFeaturedProduct = async (req, res) => {
 export const getBrands = async (req, res) => {
   const product = await Product.aggregate([
     {
-        $group: {
-          _id: "$brand",
+      $group: {
+        _id: "$brand",
         //   detail: { $push : "$$ROOT" },
-        },
       },
-      { 
-        $addFields: { brandName: "$_id" }
-      },
-      {
-        $project: { _id: 0 }
-      }
-     
+    },
+    {
+      $addFields: { brandName: "$_id" }
+    },
+    {
+      $project: { _id: 0 }
+    }
+
   ]);
 
   if (!product) {
@@ -70,37 +138,37 @@ export const getBrands = async (req, res) => {
   res.status(200).json(product);
 };
 export const getStats = async (req, res) => {
-    const productCount = await Product.find().countDocuments();
+  const productCount = await Product.find().countDocuments();
   const brands = await Product.aggregate([
     {
-        $group: {
-          _id: "$brand",
-        },
-        
+      $group: {
+        _id: "$brand",
       },
-      {
-        "$count": "total"
-      }
-      
-     
+
+    },
+    {
+      "$count": "total"
+    }
+
+
   ]);
 
   if (!brands) {
     res.status(500).json({ message: "Products not found" });
   }
-  res.status(200).json({totalProduct:productCount,totalBrands:brands});
+  res.status(200).json({ totalProduct: productCount, totalBrands: brands });
 };
 export const getAllProduct = async (req, res) => {
-  const { min, max, category,sort } = req.query;
+  const { min, max, category, sort } = req.query;
 
-  const categoryArray = category? category?.split(',')?.length > 0 ? category?.split(','):[category]:[];
+  const categoryArray = category ? category?.split(',')?.length > 0 ? category?.split(',') : [category] : [];
 
   const priceFilter = {};
   if (min) priceFilter.$gte = Number(min);
   if (max) priceFilter.$lte = Number(max);
-  const sortOrder =  sort === 'asc' ? 1 : sort === 'desc' ? -1 : null;
+  const sortOrder = sort === 'asc' ? 1 : sort === 'desc' ? -1 : null;
   try {
-    
+
     const pipeline = [
       {
         $lookup: {
@@ -146,7 +214,7 @@ export const getAllProduct = async (req, res) => {
     const productList = await Product.aggregate(pipeline);
 
 
-   
+
 
     // Return the filtered product list
     res.status(200).json(productList);
@@ -162,7 +230,7 @@ export const updateProduct = async (req, res) => {
   const oldImages = oldProduct.images;
   const files = req.files;
   let imagesPaths = [...oldImages];
-  if (files?.length>0) {
+  if (files?.length > 0) {
     let totalImages = files.length + oldImages.length;
     if (totalImages > 10) {
       res.status(500).json({ message: "Total 10 Images are allowed " });
@@ -218,41 +286,41 @@ export const deleteProduct = async (req, res) => {
       .catch((err) => {
         return res.status(500).json({ success: false, error: err });
       });
-    
+
   } catch (error) {
-    
+
   }
-  
+
 };
 export const deleteProductImage = async (req, res) => {
- try {
-   const imgPath = req.body.imgPath;
-   const oldProduct = await Product.findOne({ _id: req.params.id });
-   const oldImages = oldProduct.images;
-   const isDeleted = await deleteFileFromCloudinary(imgPath)
-   if (isDeleted) {
-     const imagesPaths = oldImages.filter((file) => {
-       if (file === imgPath) {
-         return false;
-       } else {
-         return true;
-       }
-     });
-     const product = await Product.findByIdAndUpdate(
-       req.params.id,
-       {
-         images: imagesPaths,
-       },
-       { new: true }
-     );
-     res.status(200).json({ success: true });
-   } else {
-     res.status(500).send("The image cannot be deleted by cloudinary!")
-   }
-  
- } catch (error) {
-   res.status(500).send("Internal server error!")
- }
+  try {
+    const imgPath = req.body.imgPath;
+    const oldProduct = await Product.findOne({ _id: req.params.id });
+    const oldImages = oldProduct.images;
+    const isDeleted = await deleteFileFromCloudinary(imgPath)
+    if (isDeleted) {
+      const imagesPaths = oldImages.filter((file) => {
+        if (file === imgPath) {
+          return false;
+        } else {
+          return true;
+        }
+      });
+      const product = await Product.findByIdAndUpdate(
+        req.params.id,
+        {
+          images: imagesPaths,
+        },
+        { new: true }
+      );
+      res.status(200).json({ success: true });
+    } else {
+      res.status(500).send("The image cannot be deleted by cloudinary!")
+    }
 
- 
+  } catch (error) {
+    res.status(500).send("Internal server error!")
+  }
+
+
 };

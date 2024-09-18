@@ -2,7 +2,7 @@ import React from "react";
 import Rating from "react-rating";
 import { reactIcons } from "../../utils/icons";
 
-const StarRating = ({ readonly, number, handleRating, rating }) => {
+const StarRating = ({ readonly, number, handleRating, rating ,isLg }) => {
   const handleProfileRating = (value) => {
     handleRating(value);
   };
@@ -11,10 +11,10 @@ const StarRating = ({ readonly, number, handleRating, rating }) => {
       <Rating
         readonly={readonly}
         emptySymbol={
-          <span className="text-yellow-500">{reactIcons.starOutline}</span>
+          <span className={`text-yellow-500 ${isLg? 'text-2xl':'text-base'}`}>{reactIcons.starOutline}</span>
         }
         fullSymbol={
-          <span className="text-yellow-500">{reactIcons.starFill}</span>
+          <span className={`text-yellow-500 ${isLg? 'text-2xl':'text-base'}`}>{reactIcons.starFill}</span>
         }
         fractions={1}
         initialRating={number?.toFixed(1) || rating}

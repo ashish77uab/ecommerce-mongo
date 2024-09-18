@@ -34,7 +34,7 @@ const ProductDetail = () => {
       }
     } catch (error) {
       toast.error(<ToastMsg title={error?.response?.data?.message} />);
-    } finally{
+    } finally {
       setFetchLoading(false)
     }
   };
@@ -116,7 +116,7 @@ const ProductDetail = () => {
   return (
 
     <>
-      {fetchLoading|| !product ? <Spinner/>
+      {fetchLoading || !product ? <Spinner />
         :
         <div className="py-4">
           <div className="container">
@@ -169,7 +169,7 @@ const ProductDetail = () => {
                   </div>
                 </div>
                 <div className="py-2">
-                  <StarRating readonly={true} number={product?.rating} />
+                  <StarRating readonly={true} number={product?.averageRating} />
                 </div>
                 <div className="flex gap-4 items-center">
                   {gotoCart ? (
@@ -195,6 +195,34 @@ const ProductDetail = () => {
                   )}
                 </div>
               </div>
+            </div>
+            <div className="my-6">
+              <div className="mb-2">
+                <h4 className="heading-4">Reviews ({product?.reviews?.length})</h4>
+              </div>
+              <ul className=" space-y-2  divide-y-2 border border-zinc-200 rounded-md  py-4 ">
+                {product?.reviews?.map((review) => {
+                  return (
+                    <li key={review._id} className="py-2 px-4">
+                      <div className="flex gap-4 items-start">
+                        <img
+                          className="w-10 h-10 rounded-full object-cover flex-shrink-0"
+                          src={imageRender(review?.userDetails?.profileImage || '/images/user.png')}
+                          alt={review?.user?.name}
+                        />
+                        <div className="flex-grow"> 
+                          <strong>{review?.userDetails?.fullName}</strong>
+                          <p className="text-muted">{review?.text}</p>
+                          <div className="flex gap-1 items-center">
+                            <StarRating readonly={true} number={review?.rating} />
+                          </div>
+                        </div>
+                      </div>
+
+                    </li>
+                  )
+                })}
+              </ul>
             </div>
           </div>
         </div>
