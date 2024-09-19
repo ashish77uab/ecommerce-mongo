@@ -139,7 +139,7 @@ const handleCancelOrder = async (id) => {
                                 <span className="mr-2">Quantity:</span>
                                 <b>{product?.quantity}</b>
                               </div>
-                              {product?.productDetails?.averageRating &&
+                              {product?.productDetails?.hasReviewed &&
                                 <div className="mb-2">
                                   <StarRating
                                     readonly={true}
@@ -147,7 +147,7 @@ const handleCancelOrder = async (id) => {
                                   />
                                 </div>
                               }
-                              {product?.productDetails?.averageRating === null && productId === product?.product && <div className="my-2">
+                              {product?.productDetails?.hasReviewed == false && productId === product?.product && <div className="my-2">
                                 <div >
                                   <StarRating
                                     handleRating={setRating}
@@ -164,14 +164,14 @@ const handleCancelOrder = async (id) => {
                                 </div>
                               </div>}
                               <div className="flex gap-4 items-center">
-                                {order?.status === 'Delivered' &&  product?.productDetails?.averageRating === null && productId !== product?.product && <div onClick={(e) => {
+                                {order?.status === 'Delivered' && product?.productDetails?.hasReviewed == false && !isReviewOpen && <div onClick={(e) => {
                                   setIsReviewOpen(prev => !prev)
                                   setProductId(product.product)
                                   e.stopPropagation()
                                 }} className="btn-outline-primary btn-sm py-[6px] px-6 inline-flex my-2">
                                   Add Review
                                 </div>}
-                                {productId === product?.product && product?.productDetails?.averageRating === null && (
+                                {productId === product?.product && product?.productDetails?.hasReviewed == false && (
                                   <>
                                     <div onClick={(e) => {
                                       setIsReviewOpen(prev => !prev)

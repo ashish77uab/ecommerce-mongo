@@ -155,7 +155,27 @@ export const getAllUserOrders = async (req, res) => {
       },
       {
         $addFields: {
-          "productsList.productDetails.averageRating": { $avg: "$productsList.productDetails.reviews.rating" }, // Calculate the average rating of the product
+          "productsList.productDetails.averageRating": { $avg: "$productsList.productDetails.reviews.rating" }, // Calculate average rating
+          "productsList.productDetails.hasReviewed": {
+            $cond: {
+              if: {
+                $gt: [
+                  {
+                    $size: {
+                      $filter: {
+                        input: "$productsList.productDetails.reviews",
+                        as: "review",
+                        cond: { $eq: ["$$review.user", mongoose.Types.ObjectId(userId)] }, // Check if the user has reviewed this product
+                      },
+                    },
+                  },
+                  0,
+                ],
+              },
+              then: true,
+              else: false,
+            },
+          },
         },
       },
       {
