@@ -19,6 +19,7 @@ export const userSchema = mongoose.Schema(
       enum: ["Admin", "User", "Vendor"],
       default: "User",
     },
+    levelValue: { type: Number, default: 0, },
   },
   {
     timestamps: true,

@@ -97,6 +97,9 @@ export const getProduct = async (req, res) => {
         description: { $first: "$description" },
         richDescription: { $first: "$richDescription" },
         price: { $first: "$price" },
+        countInStock: { $first: "$countInStock" },
+        numReviews: { $first: "$numReviews" },
+        isFeatured: { $first: "$isFeatured" },
         images: { $first: "$images" },
         brand: { $first: "$brand" },
         subCategory: { $first: "$subCategory" }, // Include subCategory data

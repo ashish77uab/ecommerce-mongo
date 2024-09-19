@@ -18,6 +18,7 @@ const initialState = {
     subCategory: "",
     countInStock: "",
     isFeatured: false,
+    numReviews:1
 };
 const AddProduct = () => {
     const { productId } = useParams();
@@ -129,6 +130,7 @@ const AddProduct = () => {
                     subCategory: data.subCategory?._id,
                     countInStock: data.countInStock,
                     isFeatured: data.isFeatured,
+                    numReviews:data.numReviews
                 });
                 setImages(data.images);
                 setSelect(categories?.find((item) => item.value === data.subCategory?._id))
@@ -188,6 +190,23 @@ const AddProduct = () => {
                         value={form.description}
                         onChange={handleChange}
                     />
+                    <ReactSelect
+                        label={"Choose category"}
+                        options={categories}
+                        value={select || categories[0]}
+                        onChange={(e) => {
+                            setForm({ ...form, subCategory: e?.value });
+                            setSelect(e);
+                        }}
+                    />
+                    <TextInput
+                        max={10}
+                        name="numReviews"
+                        label={"Rate product based on sell price"}
+                        placeholder="Enter rate 1 to 10 eg. 10 for higher prices product"
+                        value={form.numReviews}
+                        onChange={handleChange}
+                    />
                     <div className="col-span-2">
                         <TextArea
                             name="richDescription"
@@ -225,6 +244,7 @@ const AddProduct = () => {
                         onChange={handleChange}
                     />
                     <TextInput
+                       
                         name="price"
                         type="number"
                         label={"Price"}
@@ -233,6 +253,7 @@ const AddProduct = () => {
                         onChange={handleChange}
                     />
                     <TextInput
+                        max={200}
                         name="countInStock"
                         type="number"
                         label={"Quantity"}
@@ -240,15 +261,7 @@ const AddProduct = () => {
                         value={form.countInStock}
                         onChange={handleChange}
                     />
-                    <ReactSelect
-                        label={"Choose category"}
-                        options={categories}
-                        value={select || categories[0]}
-                        onChange={(e) => {
-                            setForm({ ...form, subCategory: e.value });
-                            setSelect(e);
-                        }}
-                    />
+                    
                     <div className="flex gap-2 col-span-2">
                         <label
                             htmlFor="isFeatured"

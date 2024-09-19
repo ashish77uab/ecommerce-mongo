@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import Order from "../models/Order.js";
 import OrderItem from "../models/OrderItem.js";
+import User from "../models/User.js";
 export const getAllOrders = async (req, res) => {
   const orderList = await Order.find().populate("user").sort({ createdAt: -1 });
   if (!orderList) {
@@ -10,18 +11,25 @@ export const getAllOrders = async (req, res) => {
 };
 export const createOrder = async (req, res) => {
   const user = req.user;
-  const orderItems = await OrderItem.find({ user: user.id , isPlaced:false}).populate(
+  const userCreatingOrder = await User?.find({ _id: user.id })
+  const orderItems = await OrderItem?.find({ user: user.id , isPlaced:false}).populate(
     "product",
-    "price"
   );
   const orderItemsIds = orderItems.map((item) => item._id);
-
-  const totalPrices = orderItems.map((item) => {
+  let totalNumReviews = userCreatingOrder?.levelValue ||0
+  const totalPrices = orderItems?.map((item) => {
     const totalPrice = item.product.price * item.quantity;
+    totalNumReviews = item.quantity * Number(item.product?.numReviews)
     return totalPrice;
   });
-
-  const totalPrice = totalPrices.reduce((a, b) => a + b, 0);
+  console.log(orderItems, 'orderItems')
+  console.log(totalNumReviews,'totalNumReviews')
+  const updatedUser = await User?.findByIdAndUpdate(user.id,
+     { $set: { levelValue: totalNumReviews }},
+     {new:true}
+     )
+  console.log(updatedUser, 'updatedUser')
+  const totalPrice =  totalPrices.reduce((a, b) => a + b, 0);
 
   let order = new Order({
     productsList: orderItemsIds,
@@ -50,10 +58,30 @@ export const removeCartItem = async (req, res) => {
 
   res.status(200).json(order);
 };
+export const cancelOrder = async (req, res) => {
+  try {
+    const user = req.user;
+    const order = await Order.findByIdAndUpdate(
+      { _id: req.body.id},
+      {
+        status: req.body.status,
+      },
+      { new: true }
+    );
+    if (!order)
+      return res.status(400).json({ message: "the order cannot be cancelled!" });
+
+    const orderItemsIds= order.productsList
+    res.status(200).json(order);
+ 
+} catch (error) {
+  console.error(error);
+  res.status(500).json({ success: false, message: "Server Error" });
+}
+};
 export const updateOrder = async (req, res) => {
   try {
   const user = req.user;
-  console.log(user,'user')
     if (user?.role !== 'Admin') {
       return res.status(401).json({ message: "Not allowed to perform this action!" });
 

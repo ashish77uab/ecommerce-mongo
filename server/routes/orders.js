@@ -9,7 +9,8 @@ import {
   getTotalSales,
   removeCartItem,
   updateOrder,
-  getAllOrdersAdmin
+  getAllOrdersAdmin,
+  cancelOrder
 } from "../controllers/orders.js";
 import { authenticateJWT } from "../middleware/auth.js";
 const router = express.Router();
@@ -22,6 +23,7 @@ router.get(`/count`, authenticateJWT, getOrdersCount);
 router.get(`/user-orders`, authenticateJWT, getAllUserOrders);
 router.post("/", authenticateJWT, createOrder);
 router.put("/", authenticateJWT, updateOrder);
+router.put("/cancel-order", authenticateJWT, cancelOrder);
 router.get("/admin/all", authenticateJWT, getAllOrdersAdmin);
 
 export default router;

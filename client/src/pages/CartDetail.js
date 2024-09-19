@@ -146,7 +146,7 @@ const CartDetail = () => {
                     <div
                       onClick={() => navigate(`/product/${product._id}`)}
                       key={product._id}
-                      className="flex md:items-center items-start hover:bg-amber-100 md:gap-6 gap-4 md:py-4 py-3 md:px-6 px-2 border-b border-b-zinc-200"
+                      className="flex md:items-center items-start  md:gap-6 gap-4 md:py-4 py-3 md:px-6 px-2 border-b border-b-zinc-200"
                     >
                       <div className=" md:w-24 md:h-24 w-16 h-16 flex-shrink-0 rounded-md overflow-hidden bg-zinc-300">
                         <img

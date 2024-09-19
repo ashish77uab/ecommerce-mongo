@@ -36,6 +36,7 @@ export const removeWishlistItem = (id) => API.delete(`wishlist/${id}`);
 // orders
 export const removeCartItem = (id) => API.delete(`orders/remove-item/${id}`);
 export const updateOrderStatus = (data) => API.put(`orders`, data);
+export const cancelOrder = (data) => API.put(`orders/cancel-order`, data);
 // admin
 export const getAllOrderList = (data) => API.get(`orders/admin/all?page=${data?.page}&limit=${data?.limit}`);
 

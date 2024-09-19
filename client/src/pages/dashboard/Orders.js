@@ -77,6 +77,7 @@ const Orders = () => {
                       ${order?.status==='Processed' && 'text-yellow-500'}
                       ${order?.status==='Delivered' && 'text-green-700'}
                       ${order?.status === 'Rejected' && 'text-red-600'}
+                      ${order?.status === 'Cancelled' && 'text-red-600'}
                        font-semibold`}>
                       {order.status}</span>
                       </td>
@@ -86,7 +87,7 @@ const Orders = () => {
                     <td>
                       <div className="flex justify-center gap-2">
 
-                        <DeleteButton
+                        {order?.status!=='Cancelled' &&  <DeleteButton
                           onClick={() => {
                             setIsConfirmedOpen(true);
                             setFormData({id:order?._id,status:order.status})
@@ -94,7 +95,7 @@ const Orders = () => {
 
                         >
                           {reactIcons.edit}
-                        </DeleteButton>
+                        </DeleteButton>}
                       </div>
                     </td>
                   </tr>
