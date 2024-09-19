@@ -164,7 +164,7 @@ const handleCancelOrder = async (id) => {
                                 </div>
                               </div>}
                               <div className="flex gap-4 items-center">
-                                {product?.productDetails?.averageRating === null && productId !== product?.product && <div onClick={(e) => {
+                                {order?.status === 'Delivered' &&  product?.productDetails?.averageRating === null && productId !== product?.product && <div onClick={(e) => {
                                   setIsReviewOpen(prev => !prev)
                                   setProductId(product.product)
                                   e.stopPropagation()
