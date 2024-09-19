@@ -8,7 +8,21 @@ import Spinner from "../components/loaders/Spinner";
 import { uploadImage, uploadProfileImage } from "../api/api";
 import { updateUser } from "../redux/features/authSlice";
 import { imageRender } from "../utils/helpers";
+const LEVEL_POINTS=[
+    {
+        level: "Bronze",
+        points: 100,
+    },
+    {
+        level: "Silver",
+        points: 500,
+    },
+    {
+        level: "Gold",
+        points: 5000,
+    },
 
+]
 
 const Profile = () => {
     const [isLoading, setIsLoading] = useState(false);
@@ -52,7 +66,7 @@ const Profile = () => {
             <div className="py-10">
                 <div className="container relative">
                     <div className="relative">
-                        <div className=" h-96 rounded-lg overflow-hidden">
+                        <div className=" md:h-72 h-36 lg:h-96 rounded-lg overflow-hidden">
                             {user?.coverImage ? (
                                 <img
                                     className=" hoverable-img w-full"
@@ -61,7 +75,7 @@ const Profile = () => {
                                 />
                             ) : (
                                 <div className="flex-center w-full h-full bg-zinc-300">
-                                    <h6 className="heading-4">Add your cover Image</h6>
+                                    <h6 className="md:heading-4 heading-7">Add your cover Image</h6>
                                 </div>
                             )}
                         </div>
@@ -80,8 +94,8 @@ const Profile = () => {
                             />
                         </label>
                     </div>
-                    <div className="relative top-[-50px] px-4  flex gap-6 items-start">
-                        <div className="w-32 relative h-32 flex-shrink-0 rounded-full bg-amber-500 p-[2px] ">
+                    <div className="relative mt-[-40px] lg:mt-[-50px] px-4  flex lg:flex-row flex-col  justify-center lg:justify-start gap-2 lg:gap-6 items-center lg:items-start">
+                        <div className="md:w-32 md:h-32 h-16 w-16 relative  flex-shrink-0 rounded-full bg-amber-500 p-[2px] ">
                             <img
                                 className="w-full h-full rounded-full object-cover"
                                 src={
@@ -93,7 +107,7 @@ const Profile = () => {
                             />
                             <label
                                 htmlFor="profile"
-                                className="w-10 h-10 rounded-full cursor-pointer absolute bottom-0 right-0 bg-amber-200 text-black flex-center"
+                                className="md:w-10  md:h-10 h-8 w-8  rounded-full cursor-pointer absolute bottom-0 right-0 bg-amber-200 text-black flex-center"
                             >
                                 {reactIcons.camera}
                                 <input
@@ -106,11 +120,13 @@ const Profile = () => {
                                 />
                             </label>
                         </div>
-                        <div className="pt-16 flex-1">
-                            <h4 className="heading-4">{user?.fullName}</h4>
-                            <p className="text-base leading-[1] text-gray-600">
+                        <div className="lg:pt-16 flex-1 lg:text-left text-center">
+                            <h4 className="md:heading-4 heading-6">{user?.fullName}</h4>
+                            <p className="md:text-base leading-[1] text-[12px] text-gray-600">
                                 {user?.email}
                             </p>
+                            <p >You have <b>{user?.levelValue}</b> points</p>
+                            <p className="text-muted text-sm">Note: Shop more to get more points to unclock your next level</p>
                             <div className=" my-2 ">
                                 {user?.mobile && (
                                     <div className="flex gap-2">
@@ -148,6 +164,19 @@ const Profile = () => {
                             </div>
                             
                         </div>
+                    </div>
+                    <div className="mb-8 p-0 lg:p-8 rounded-md grid grid-cols-1 md:grid-cols-1 lg:grid-cols-3 gap-4">
+                        {LEVEL_POINTS?.map(((level,index)=>{
+                            return (
+                                <div key={level} className={`border border-amber-700   rounded-md p-4 md:px-6 px-2 md:p-6 ${user?.levelValue >= level?.points &&'bg-amber-700 text-white'}`}>
+                                    <h3 className="md:text-3xl text-xl text-center font-semibold">{level?.level}</h3>
+                                    <p className="md:text-lg text-base text-center font-semibold">Rewards: {level?.points} points</p>
+                                    {user?.levelValue >= level?.points && <p className="text-[12px] opacity-80 text-center font-semibold">You have covered {level?.level}, shop more to reach another level</p>}
+                                </div>
+                            ) 
+ 
+                        }))}
+
                     </div>
 
                     

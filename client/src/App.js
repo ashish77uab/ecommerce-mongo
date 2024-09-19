@@ -89,7 +89,7 @@ function App() {
       </BrowserRouter>
       <ToastContainer
         className={
-          "lg:w-[500px] text-16 font-semibold w-[320px] p-0 !font-poppins"
+          "lg:w-[500px] text-16 font-semibold w-full max-w-full  m-auto p-0 !font-poppins"
         }
         position="top-center"
         autoClose={5000}

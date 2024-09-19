@@ -1,77 +1,97 @@
 import { deleteFileFromCloudinary, uploadImageToCloudinary } from "../helpers/functions.js";
 import SubCategory from "../models/SubCategory.js";
 export const createSubCategory = async (req, res) => {
-  const file = req.file;
-  if (!file) return res.status(400).json({ message: "No icon found" });
-  const fileFromCloudinary = await uploadImageToCloudinary(req.file, res)
-  let category = new SubCategory({
-    name: req.body.name,
-    icon: fileFromCloudinary?.url,
-    color: req.body.color,
-    category: req.body.category,
-    description: req.body.description,
-  });
-  category = await category.save();
+ try {
+   const file = req.file;
+   if (!file) return res.status(400).json({ message: "No icon found" });
+   const fileFromCloudinary = await uploadImageToCloudinary(req.file, res)
+   let category = new SubCategory({
+     name: req.body.name,
+     icon: fileFromCloudinary?.url,
+     color: req.body.color,
+     category: req.body.category,
+     description: req.body.description,
+   });
+   category = await category.save();
 
-  if (!category)
-    return res.status(400).json({ message: "the category cannot be created!" });
+   if (!category)
+     return res.status(400).json({ message: "the category cannot be created!" });
 
-  res.status(201).json(category);
+   res.status(201).json(category);
+ } catch (error) {
+   return res.status(500).json(error);
+ }
 };
 export const getSubCategory = async (req, res) => {
-  const category = await SubCategory.findById(req.params.id);
-  if (!category) {
-    res
-      .status(500)
-      .json({ message: "The category with the given ID was not found." });
-  }
-  res.status(200).json(category);
+ try {
+   const category = await SubCategory.findById(req.params.id);
+   if (!category) {
+     res
+       .status(500)
+       .json({ message: "The category with the given ID was not found." });
+   }
+   res.status(200).json(category);
+ } catch (error) {
+   return res.status(500).json(error);
+ }
 };
 export const getAllSubCategory = async (req, res) => {
-  const { id } = req.body;
-  const categoryList = await SubCategory.find({ category: id });
+ try {
+   const { id } = req.body;
+   const categoryList = await SubCategory.find({ category: id });
 
-  if (!categoryList) {
-    res.status(500).json({ success: false });
-  }
-  res.status(200).json(categoryList);
+   if (!categoryList) {
+     res.status(500).json({ success: false });
+   }
+   res.status(200).json(categoryList);
+ } catch (error) {
+   return res.status(500).json(error);
+ }
 };
 export const getAllSubCategories = async (req, res) => {
-    const categoryList = await SubCategory.find({});
-  
-    if (!categoryList) {
-      res.status(500).json({ success: false });
+    try {
+      const categoryList = await SubCategory.find({});
+
+      if (!categoryList) {
+        res.status(500).json({ success: false });
+      }
+      res.status(200).json(categoryList);
+    } catch (error) {
+      return res.status(500).json(error);
     }
-    res.status(200).json(categoryList);
   };
 export const updateSubCategory = async (req, res) => {
-  const oldCategory = await SubCategory.findById(req.params.id);
-  let iconToSet;
-  const file = req.file;
-  if (file) {
-    const isDeleted = await deleteFileFromCloudinary(oldCategory?.icon)
-    if (isDeleted) {
-      const fileFromCloudinary = await uploadImageToCloudinary(req.file, res)
-      iconToSet = fileFromCloudinary?.url;
-    }
-  } else {
-    iconToSet = req.body.icon;
-  }
-  const category = await SubCategory.findByIdAndUpdate(
-    req.params.id,
-    {
-      name: req.body.name,
-      icon: iconToSet,
-      color: req.body.color,
-      category: req.body.category,
-      description: req.body.description,
-    },
-    { new: true }
-  );
+ try {
+   const oldCategory = await SubCategory.findById(req.params.id);
+   let iconToSet;
+   const file = req.file;
+   if (file) {
+     const isDeleted = await deleteFileFromCloudinary(oldCategory?.icon)
+     if (isDeleted) {
+       const fileFromCloudinary = await uploadImageToCloudinary(req.file, res)
+       iconToSet = fileFromCloudinary?.url;
+     }
+   } else {
+     iconToSet = req.body.icon;
+   }
+   const category = await SubCategory.findByIdAndUpdate(
+     req.params.id,
+     {
+       name: req.body.name,
+       icon: iconToSet,
+       color: req.body.color,
+       category: req.body.category,
+       description: req.body.description,
+     },
+     { new: true }
+   );
 
-  if (!category)
-    return res.status(400).json({ message: "the category cannot be updated!" });
-  res.status(201).json(category);
+   if (!category)
+     return res.status(400).json({ message: "the category cannot be updated!" });
+   res.status(201).json(category);
+ } catch (error) {
+   return res.status(500).json(error);
+ }
 };
 export const deleteSubCategory = async (req, res) => {
   try {
@@ -107,9 +127,7 @@ export const deleteSubCategory = async (req, res) => {
     }
 
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Internal server error" });
+    return res.status(500).json(error);
 
   }
 };

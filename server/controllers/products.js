@@ -5,180 +5,205 @@ import { deleteFileFromCloudinary, uploadImageToCloudinary } from "../helpers/fu
 import Review from "../models/Review.js";
 
 export const createReviewForProduct = async (req, res) => {
-  const user=req.user
-  let review = new Review({
-    ...req.body,
-    user:user?.id
-  });
-  review = await review.save();
-  if (!review)
-    return res.status(500).json({ message: "Unable to create review for this products" });
-  res.status(201).json(review);
+  try {
+    const user = req.user
+    let review = new Review({
+      ...req.body,
+      user: user?.id
+    });
+    review = await review.save();
+    if (!review)
+      return res.status(500).json({ message: "Unable to create review for this products" });
+    res.status(201).json(review);
+  } catch (error) {
+    return res.status(500).json(error);
+  }
 };
 export const createProduct = async (req, res) => {
-  const category = await SubCategory.findById(req.body.subCategory);
-  if (!category) return res.status(400).send("Invalid Category");
-  const files = req.files;
-  if (files?.length < 1) return res.status(400).json({ message: "No images uploaded" });
-  let imagesPaths = [];
-  let tempPath = []
-  if (files?.length > 0) {
-    files.forEach(async (file) => {
-      tempPath.push(uploadImageToCloudinary(file, res))
-    });
-    const tempImagePaths = await Promise.all(tempPath)
-    imagesPaths = tempImagePaths.map((path) => path.url);
-  }
-  let product = new Product({
-    ...req.body,
-    images: imagesPaths,
-  });
+ try {
+   const category = await SubCategory.findById(req.body.subCategory);
+   if (!category) return res.status(400).send("Invalid Category");
+   const files = req.files;
+   if (files?.length < 1) return res.status(400).json({ message: "No images uploaded" });
+   let imagesPaths = [];
+   let tempPath = []
+   if (files?.length > 0) {
+     files.forEach(async (file) => {
+       tempPath.push(uploadImageToCloudinary(file, res))
+     });
+     const tempImagePaths = await Promise.all(tempPath)
+     imagesPaths = tempImagePaths.map((path) => path.url);
+   }
+   let product = new Product({
+     ...req.body,
+     images: imagesPaths,
+   });
 
-  product = await product.save();
+   product = await product.save();
 
-  if (!product)
-    return res.status(500).json({ message: "Unable to create product" });
-  res.status(201).json(product);
+   if (!product)
+     return res.status(500).json({ message: "Unable to create product" });
+   res.status(201).json(product);
+ } catch (error) {
+   return res.status(500).json(error);
+ }
 };
 export const getProduct = async (req, res) => {
-  const productId = mongoose.Types.ObjectId(req.params.id); // Convert id to ObjectId
-  const product = await Product.aggregate([
-    {
-      $match: { _id: productId }, // Match the product by its ID
-    },
-    {
-      $lookup: {
-        from: "subcategories", // Join with the SubCategory collection
-        localField: "subCategory",
-        foreignField: "_id",
-        as: "subCategory",
-      },
-    },
-    {
-      $unwind: {
-        path: "$subCategory", // Unwind the subCategory field
-        preserveNullAndEmptyArrays: true,
-      },
-    },
-    {
-      $lookup: {
-        from: "reviews", // Join with the Review collection
-        localField: "_id", // Product ID in Review schema
-        foreignField: "product", // Product field in Review schema
-        as: "reviews", // Output as reviews
-      },
-    },
-    {
-      $unwind: {
-        path: "$reviews", // Unwind reviews array if needed
-        preserveNullAndEmptyArrays: true,
-      },
-    },
-    
-    {
-      $lookup: {
-        from: "users", // Join with the User collection for review author
-        localField: "reviews.user",
-        foreignField: "_id",
-        as: "reviews.userDetails", // Add user details to each review
-      },
-    },
-    {
-      $unwind: {
-        path: "$reviews.userDetails", // Unwind user details for each review
-        preserveNullAndEmptyArrays: true,
-      },
-    },
-    
-    {
-      $group: {
-        _id: "$_id", // Group back to the product document
-        name: { $first: "$name" },
-        description: { $first: "$description" },
-        richDescription: { $first: "$richDescription" },
-        price: { $first: "$price" },
-        countInStock: { $first: "$countInStock" },
-        numReviews: { $first: "$numReviews" },
-        isFeatured: { $first: "$isFeatured" },
-        images: { $first: "$images" },
-        brand: { $first: "$brand" },
-        subCategory: { $first: "$subCategory" }, // Include subCategory data
-        reviews: { $push: "$reviews" }, // Collect all reviews
-        averageRating: { $avg: "$reviews.rating" },
-      },
-    },
-  ]);
-  const result = product[0];
-  if (result.averageRating === null) {
-    result.reviews = [];
-  }
+ try {
+   const productId = mongoose.Types.ObjectId(req.params.id); // Convert id to ObjectId
+   const product = await Product.aggregate([
+     {
+       $match: { _id: productId }, // Match the product by its ID
+     },
+     {
+       $lookup: {
+         from: "subcategories", // Join with the SubCategory collection
+         localField: "subCategory",
+         foreignField: "_id",
+         as: "subCategory",
+       },
+     },
+     {
+       $unwind: {
+         path: "$subCategory", // Unwind the subCategory field
+         preserveNullAndEmptyArrays: true,
+       },
+     },
+     {
+       $lookup: {
+         from: "reviews", // Join with the Review collection
+         localField: "_id", // Product ID in Review schema
+         foreignField: "product", // Product field in Review schema
+         as: "reviews", // Output as reviews
+       },
+     },
+     {
+       $unwind: {
+         path: "$reviews", // Unwind reviews array if needed
+         preserveNullAndEmptyArrays: true,
+       },
+     },
+
+     {
+       $lookup: {
+         from: "users", // Join with the User collection for review author
+         localField: "reviews.user",
+         foreignField: "_id",
+         as: "reviews.userDetails", // Add user details to each review
+       },
+     },
+     {
+       $unwind: {
+         path: "$reviews.userDetails", // Unwind user details for each review
+         preserveNullAndEmptyArrays: true,
+       },
+     },
+
+     {
+       $group: {
+         _id: "$_id", // Group back to the product document
+         name: { $first: "$name" },
+         description: { $first: "$description" },
+         richDescription: { $first: "$richDescription" },
+         price: { $first: "$price" },
+         countInStock: { $first: "$countInStock" },
+         numReviews: { $first: "$numReviews" },
+         isFeatured: { $first: "$isFeatured" },
+         images: { $first: "$images" },
+         brand: { $first: "$brand" },
+         subCategory: { $first: "$subCategory" }, // Include subCategory data
+         reviews: { $push: "$reviews" }, // Collect all reviews
+         averageRating: { $avg: "$reviews.rating" },
+       },
+     },
+   ]);
+   const result = product[0];
+   if (result.averageRating === null) {
+     result.reviews = [];
+   }
+
+   res.status(200).json(result);
+ } catch (error) {
+   return res.status(500).json(error);
   
-  res.status(200).json(result);
+ }
 };
 export const getFeaturedProduct = async (req, res) => {
-  const product = await Product.find({ isFeatured: true }).populate(
-    "subCategory"
-  );
+ try {
+   const product = await Product.find({ isFeatured: true }).populate(
+     "subCategory"
+   );
 
-  if (!product) {
-    res.status(500).json({ message: "Product not found" });
-  }
-  res.status(200).json(product);
+   if (!product) {
+     res.status(500).json({ message: "Product not found" });
+   }
+   res.status(200).json(product);
+ } catch (error) {
+   return res.status(500).json(error);
+ }
 };
 export const getBrands = async (req, res) => {
-  const product = await Product.aggregate([
-    {
-      $group: {
-        _id: "$brand",
-        //   detail: { $push : "$$ROOT" },
-      },
-    },
-    {
-      $addFields: { brandName: "$_id" }
-    },
-    {
-      $project: { _id: 0 }
-    }
+ try {
+   const product = await Product.aggregate([
+     {
+       $group: {
+         _id: "$brand",
+         //   detail: { $push : "$$ROOT" },
+       },
+     },
+     {
+       $addFields: { brandName: "$_id" }
+     },
+     {
+       $project: { _id: 0 }
+     }
 
-  ]);
+   ]);
 
-  if (!product) {
-    res.status(500).json({ message: "Products not found" });
-  }
-  res.status(200).json(product);
+   if (!product) {
+     res.status(500).json({ message: "Products not found" });
+   }
+   res.status(200).json(product);
+ } catch (error) {
+   return res.status(500).json(error);
+ }
 };
 export const getStats = async (req, res) => {
-  const productCount = await Product.find().countDocuments();
-  const brands = await Product.aggregate([
-    {
-      $group: {
-        _id: "$brand",
-      },
+ try {
+   const productCount = await Product.find().countDocuments();
+   const brands = await Product.aggregate([
+     {
+       $group: {
+         _id: "$brand",
+       },
 
-    },
-    {
-      "$count": "total"
-    }
+     },
+     {
+       "$count": "total"
+     }
 
 
-  ]);
+   ]);
 
-  if (!brands) {
-    res.status(500).json({ message: "Products not found" });
-  }
-  res.status(200).json({ totalProduct: productCount, totalBrands: brands });
+   if (!brands) {
+     res.status(500).json({ message: "Products not found" });
+   }
+   res.status(200).json({ totalProduct: productCount, totalBrands: brands });
+ } catch (error) {
+   return res.status(500).json(error);
+ }
 };
 export const getAllProduct = async (req, res) => {
-  const { min, max, category, sort } = req.query;
-
-  const categoryArray = category ? category?.split(',')?.length > 0 ? category?.split(',') : [category] : [];
-
-  const priceFilter = {};
-  if (min) priceFilter.$gte = Number(min);
-  if (max) priceFilter.$lte = Number(max);
-  const sortOrder = sort === 'asc' ? 1 : sort === 'desc' ? -1 : null;
+ 
   try {
+    const { min, max, category, sort } = req.query;
 
+    const categoryArray = category ? category?.split(',')?.length > 0 ? category?.split(',') : [category] : [];
+
+    const priceFilter = {};
+    if (min) priceFilter.$gte = Number(min);
+    if (max) priceFilter.$lte = Number(max);
+    const sortOrder = sort === 'asc' ? 1 : sort === 'desc' ? -1 : null;
     const pipeline = [
       {
         $lookup: {
@@ -229,45 +254,49 @@ export const getAllProduct = async (req, res) => {
     // Return the filtered product list
     res.status(200).json(productList);
   } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+    return res.status(500).json(error);
   }
 };
 export const updateProduct = async (req, res) => {
-  if (!mongoose.isValidObjectId(req.params.id)) {
-    return res.status(400).json({ message: "Invalid Product Id" });
-  }
-  const oldProduct = await Product.findOne({ _id: req.params.id });
-  const oldImages = oldProduct.images;
-  const files = req.files;
-  let imagesPaths = [...oldImages];
-  if (files?.length > 0) {
-    let totalImages = files.length + oldImages.length;
-    if (totalImages > 10) {
-      res.status(500).json({ message: "Total 10 Images are allowed " });
-    } else {
-      let tempPath = []
-      files.forEach(async (file) => {
-        tempPath.push(uploadImageToCloudinary(file, res))
-      });
-      const tempImagePaths = await Promise.all(tempPath)
-      const allUploadedPaths = tempImagePaths.map((path) => path.url);
-      imagesPaths = imagesPaths.concat(allUploadedPaths);;
-    }
-  }
-  let data = { ...req.body };
-  delete data.images;
-  const product = await Product.findByIdAndUpdate(
-    req.params.id,
-    {
-      ...data,
-      images: imagesPaths,
-    },
-    { new: true }
-  );
-  if (!product)
-    return res.status(500).json({ message: "The product cannot be updated!" });
+ try {
+   if (!mongoose.isValidObjectId(req.params.id)) {
+     return res.status(400).json({ message: "Invalid Product Id" });
+   }
+   const oldProduct = await Product.findOne({ _id: req.params.id });
+   const oldImages = oldProduct.images;
+   const files = req.files;
+   let imagesPaths = [...oldImages];
+   if (files?.length > 0) {
+     let totalImages = files.length + oldImages.length;
+     if (totalImages > 10) {
+       res.status(500).json({ message: "Total 10 Images are allowed " });
+     } else {
+       let tempPath = []
+       files.forEach(async (file) => {
+         tempPath.push(uploadImageToCloudinary(file, res))
+       });
+       const tempImagePaths = await Promise.all(tempPath)
+       const allUploadedPaths = tempImagePaths.map((path) => path.url);
+       imagesPaths = imagesPaths.concat(allUploadedPaths);;
+     }
+   }
+   let data = { ...req.body };
+   delete data.images;
+   const product = await Product.findByIdAndUpdate(
+     req.params.id,
+     {
+       ...data,
+       images: imagesPaths,
+     },
+     { new: true }
+   );
+   if (!product)
+     return res.status(500).json({ message: "The product cannot be updated!" });
 
-  res.status(201).json(product);
+   res.status(201).json(product);
+ } catch (error) {
+   return res.status(500).json(error);
+ }
 };
 export const deleteProduct = async (req, res) => {
   try {
@@ -298,7 +327,7 @@ export const deleteProduct = async (req, res) => {
       });
 
   } catch (error) {
-
+    return res.status(500).json(error);
   }
 
 };
@@ -329,7 +358,7 @@ export const deleteProductImage = async (req, res) => {
     }
 
   } catch (error) {
-    res.status(500).send("Internal server error!")
+    return res.status(500).json(error);
   }
 
 

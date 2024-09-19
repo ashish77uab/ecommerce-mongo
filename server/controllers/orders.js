@@ -3,60 +3,70 @@ import Order from "../models/Order.js";
 import OrderItem from "../models/OrderItem.js";
 import User from "../models/User.js";
 export const getAllOrders = async (req, res) => {
-  const orderList = await Order.find().populate("user").sort({ createdAt: -1 });
-  if (!orderList) {
-    res.status(500).json({ success: false });
-  }
-  res.status(200).json(orderList);
+ try {
+   const orderList = await Order.find().populate("user").sort({ createdAt: -1 });
+   if (!orderList) {
+     res.status(500).json({ success: false });
+   }
+   res.status(200).json(orderList);
+ } catch (error) {
+   return res.status(500).json(error);
+ }
 };
 export const createOrder = async (req, res) => {
-  const user = req.user;
-  const userCreatingOrder = await User?.find({ _id: user.id })
-  const orderItems = await OrderItem?.find({ user: user.id , isPlaced:false}).populate(
-    "product",
-  );
-  const orderItemsIds = orderItems.map((item) => item._id);
-  let totalNumReviews = userCreatingOrder?.levelValue ||0
-  const totalPrices = orderItems?.map((item) => {
-    const totalPrice = item.product.price * item.quantity;
-    totalNumReviews = item.quantity * Number(item.product?.numReviews)
-    return totalPrice;
-  });
-  console.log(orderItems, 'orderItems')
-  console.log(totalNumReviews,'totalNumReviews')
-  const updatedUser = await User?.findByIdAndUpdate(user.id,
-     { $set: { levelValue: totalNumReviews }},
-     {new:true}
-     )
-  console.log(updatedUser, 'updatedUser')
-  const totalPrice =  totalPrices.reduce((a, b) => a + b, 0);
+  try {
+    const user = req.user;
+    const userCreatingOrder = await User?.find({ _id: user.id })
+    const orderItems = await OrderItem?.find({ user: user.id, isPlaced: false }).populate(
+      "product",
+    );
+    const orderItemsIds = orderItems.map((item) => item._id);
+    let totalNumReviews = userCreatingOrder?.levelValue || 0
+    const totalPrices = orderItems?.map((item) => {
+      const totalPrice = item.product.price * item.quantity;
+      totalNumReviews = item.quantity * Number(item.product?.numReviews)
+      return totalPrice;
+    });
 
-  let order = new Order({
-    productsList: orderItemsIds,
-    shippingAddress1: req.body.shippingAddress1,
-    shippingAddress2: req.body.shippingAddress2,
-    city: req.body.city,
-    zip: req.body.zip,
-    country: req.body.country,
-    phone: req.body.phone,
-    totalPrice: totalPrice,
-    user: user.id,
-  });
-  order = await order.save();
-  await OrderItem.updateMany({ user: user.id }, { isPlaced: true });
-  if (!order) return res.status(400).send("the order cannot be created!");
-  res.send(order);
+    const updatedUser = await User?.findByIdAndUpdate(user.id,
+      { $set: { levelValue: totalNumReviews } },
+      { new: true }
+    )
+    const totalPrice = totalPrices.reduce((a, b) => a + b, 0);
+
+    let order = new Order({
+      productsList: orderItemsIds,
+      shippingAddress1: req.body.shippingAddress1,
+      shippingAddress2: req.body.shippingAddress2,
+      city: req.body.city,
+      zip: req.body.zip,
+      country: req.body.country,
+      phone: req.body.phone,
+      totalPrice: totalPrice,
+      user: user.id,
+    });
+    order = await order.save();
+    await OrderItem.updateMany({ user: user.id }, { isPlaced: true });
+    if (!order) return res.status(400).send("the order cannot be created!");
+    res.send(order); 
+  } catch (error) {
+    return res.status(500).json(error);
+  }
 };
 export const removeCartItem = async (req, res) => {
-  const order = await OrderItem.findOneAndDelete(
-    {_id:req.params.id},
-    { new: true }
-  );
+ try {
+   const order = await OrderItem.findOneAndDelete(
+     { _id: req.params.id },
+     { new: true }
+   );
 
-  if (!order)
-    return res.status(400).json({ message: "Error while removing this item!" });
+   if (!order)
+     return res.status(400).json({ message: "Error while removing this item!" });
 
-  res.status(200).json(order);
+   res.status(200).json(order);
+ } catch (error) {
+   return res.status(500).json(error);
+ }
 };
 export const cancelOrder = async (req, res) => {
   try {
@@ -75,8 +85,7 @@ export const cancelOrder = async (req, res) => {
     res.status(200).json(order);
  
 } catch (error) {
-  console.error(error);
-  res.status(500).json({ success: false, message: "Server Error" });
+    return res.status(500).json(error);
 }
 };
 export const updateOrder = async (req, res) => {
@@ -100,8 +109,7 @@ export const updateOrder = async (req, res) => {
     res.status(200).json(order);
  
 } catch (error) {
-  console.error(error);
-  res.status(500).json({ success: false, message: "Server Error" });
+    return res.status(500).json(error);
 }
 };
 
@@ -174,8 +182,7 @@ export const getAllUserOrders = async (req, res) => {
     res.status(200).json(orders);
 
     } catch (error) {
-      console.error(error);
-      res.status(500).json({ success: false, message: "Server Error" });
+    return res.status(500).json(error);
     }
   };
 export const getAllOrdersAdmin = async (req, res) => {
@@ -257,19 +264,23 @@ export const getAllOrdersAdmin = async (req, res) => {
     });
     } catch (error) {
       console.error(error);
-      res.status(500).json({ success: false, message: "Server Error" });
+    return res.status(500).json(error);
     }
   };
 export const getTotalSales = async (req, res) => {
-  const totalSales = await Order.aggregate([
-    { $group: { _id: null, totalsales: { $sum: "$totalPrice" } } },
-  ]);
+  try {
+    const totalSales = await Order.aggregate([
+      { $group: { _id: null, totalsales: { $sum: "$totalPrice" } } },
+    ]);
 
-  if (!totalSales) {
-    return res.status(400).send("The order sales cannot be generated");
+    if (!totalSales) {
+      return res.status(400).send("The order sales cannot be generated");
+    }
+
+    res.status(200).json({ totalsales: totalSales.pop().totalsales });
+  } catch (error) {
+    return res.status(500).json(error);
   }
-
-  res.status(200).json({ totalsales: totalSales.pop().totalsales });
 };
 export const getOrdersCount = async (req, res) => {
   const orderCount = await Order.countDocuments({});
@@ -281,26 +292,35 @@ export const getOrdersCount = async (req, res) => {
   });
 };
 export const addToCart = async (req, res) => {
-  const { product, quantity } = req.body;
-  const user = req.user;
-  const orderItem = await OrderItem.create({
-    product,
-    quantity,
-    user: user.id,
-  });
-  if (!orderItem) {
-    res.status(500).json({ success: false });
+  try {
+    const { product, quantity } = req.body;
+    const user = req.user;
+    const orderItem = await OrderItem.create({
+      product,
+      quantity,
+      user: user.id,
+    });
+    if (!orderItem) {
+      res.status(500).json({ success: false });
+    }
+    res.status(200).json(orderItem);
+    
+  } catch (error) {
+    return res.status(500).json(error);
   }
-  res.status(200).json(orderItem);
 };
 export const getAllCartItem = async (req, res) => {
-  const user = req.user;
-  const orderItems = await OrderItem.find({
-    user: user.id,
-    isPlaced: false,
-  }).populate("product");
-  if (!orderItems) {
-    res.status(500).json({ success: false });
-  }
-  res.status(200).json(orderItems);
+ try {
+   const user = req.user;
+   const orderItems = await OrderItem.find({
+     user: user.id,
+     isPlaced: false,
+   }).populate("product");
+   if (!orderItems) {
+     res.status(500).json({ success: false });
+   }
+   res.status(200).json(orderItems);
+ } catch (error) {
+   return res.status(500).json(error);
+ }
 };

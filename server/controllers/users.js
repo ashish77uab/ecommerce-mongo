@@ -9,9 +9,9 @@ import mongoose from "mongoose";
 import { deleteFileFromCloudinary, uploadImageToCloudinary } from "../helpers/functions.js";
 
 export const signin = async (req, res) => {
-  const { email, password } = req.body;
 
   try {
+    const { email, password } = req.body;
     const userData = await User.aggregate([
       {
         $match: { email: email }, // Find the user by email
@@ -63,22 +63,22 @@ export const signin = async (req, res) => {
 
     res.status(200).json({ result: oldUser, token });
   } catch (error) {
-    res.status(500).json({ message: "Something went wrong" });
-    console.log(error);
+    return res.status(500).json(error);
   }
 };
 export const uploadProfileImage = async (req, res) => {
-  const { type, image } = req.body;
-  const { id } = req.params;
-  const OldUser = await User.findOne({ _id: id });
-  let oldFile, imageToSet,tempImage;
-  if (type === "cover") {
-    oldFile = OldUser.coverImage;
-  } else {
-    oldFile = OldUser.profileImage;
-  }
+ 
 
   try {
+    const { type, image } = req.body;
+    const { id } = req.params;
+    const OldUser = await User.findOne({ _id: id });
+    let oldFile, imageToSet, tempImage;
+    if (type === "cover") {
+      oldFile = OldUser.coverImage;
+    } else {
+      oldFile = OldUser.profileImage;
+    }
     if(oldFile){
       const isDeleted = await deleteFileFromCloudinary(oldFile)
       if (isDeleted) {
@@ -105,17 +105,17 @@ export const uploadProfileImage = async (req, res) => {
 
     res.status(200).json(newUser);
   } catch (error) {
-    res.status(500).json({ message: "Something went wrong" });
-    console.log(error);
+    return res.status(500).json(error);
   }
 };
 
 export const signup = async (req, res) => {
-  const data = { ...req.body };
-  let fullName = `${data.firstName} ${data.lastName}`;
-  delete data.firstName;
-  delete data.lastName;
+ 
   try {
+    const data = { ...req.body };
+    let fullName = `${data.firstName} ${data.lastName}`;
+    delete data.firstName;
+    delete data.lastName;
     const oldUser = await User.findOne({ email: data.email });
 
     if (oldUser) {
@@ -139,15 +139,15 @@ export const signup = async (req, res) => {
     );
     res.status(201).json({ result, token });
   } catch (error) {
-    res.status(500).json({ message: "Something went wrong" });
-    console.log(error);
+    return res.status(500).json(error);
   }
 };
 
 export const googleSignIn = async (req, res) => {
-  const { email, name, token, googleId } = req.body;
+ 
 
   try {
+    const { email, name, token, googleId } = req.body;
     const oldUser = await User.findOne({ email });
     if (oldUser) {
       const result = { _id: oldUser._id.toString(), email, name };
@@ -162,8 +162,7 @@ export const googleSignIn = async (req, res) => {
 
     res.status(200).json({ result, token });
   } catch (error) {
-    res.status(500).json({ message: "Something went wrong" });
-    console.log(error);
+    return res.status(500).json(error);
   }
 };
 export const getUser = async (req, res) => {
@@ -209,8 +208,8 @@ export const getUser = async (req, res) => {
 
     res.status(200).json(userData[0] || {}); // Send the first (and likely only) result back
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Server Error" });
+    return res.status(500).json(error);
+
   }
 };
 // export const getUser = async (req, res) => {
@@ -221,81 +220,93 @@ export const getUser = async (req, res) => {
 //   res.status(200).json(userData);
 // };
 export const getUsers = async (req, res) => {
-  const users = await User.find({});
-  res.status(200).json(users);
+ try {
+   const users = await User.find({});
+   res.status(200).json(users);
+ } catch (error) {
+   return res.status(500).json(error);
+ }
 };
 
 export const resetPasswordRequestController = async (req, res) => {
-  const user = await User.findOne({ email: req.body.email });
-  if (!user) res.status(404).json({ message: "Email does not exist" });
+ try {
+   const user = await User.findOne({ email: req.body.email });
+   if (!user) res.status(404).json({ message: "Email does not exist" });
 
-  let token = await Token.findOne({ userId: user._id });
-  if (token) {
-    await token.deleteOne();
-  }
+   let token = await Token.findOne({ userId: user._id });
+   if (token) {
+     await token.deleteOne();
+   }
 
-  let resetToken = crypto.randomBytes(32).toString("hex");
-  const hash = await bcrypt.hash(resetToken, Number(process.env.BCRYPT_SALT));
+   let resetToken = crypto.randomBytes(32).toString("hex");
+   const hash = await bcrypt.hash(resetToken, Number(process.env.BCRYPT_SALT));
 
-  await new Token({
-    userId: user._id,
-    token: hash,
-    createdAt: Date.now(),
-  }).save();
+   await new Token({
+     userId: user._id,
+     token: hash,
+     createdAt: Date.now(),
+   }).save();
 
-  const link = `${process.env.CLIENT_URL}/passwordReset?token=${resetToken}&id=${user._id}`;
+   const link = `${process.env.CLIENT_URL}/passwordReset?token=${resetToken}&id=${user._id}`;
 
-  sendEmail(
-    user.email,
-    "Password Reset Request",
-    {
-      name: user.fullName,
-      link: link,
-    },
-    "/views/template/requestResetPassword.ejs"
-  );
-  return res.json({ link });
+   sendEmail(
+     user.email,
+     "Password Reset Request",
+     {
+       name: user.fullName,
+       link: link,
+     },
+     "/views/template/requestResetPassword.ejs"
+   );
+   return res.json({ link });
+ } catch (error) {
+   return res.status(500).json(error);
+ }
 };
 
 export const resetPasswordController = async (req, res) => {
-  const { userId, token, password } = req.body;
+  try {
+    const { userId, token, password } = req.body;
 
-  let passwordResetToken = await Token.findOne({ userId });
+    let passwordResetToken = await Token.findOne({ userId });
 
-  if (!passwordResetToken) {
-    res
-      .status(404)
-      .json({ message: "Invalid or expired password reset token first one" });
+    if (!passwordResetToken) {
+      res
+        .status(404)
+        .json({ message: "Invalid or expired password reset token first one" });
+    }
+
+    const isValid = await bcrypt.compare(token, passwordResetToken.token);
+
+    if (!isValid) {
+      res
+        .status(404)
+        .json({ message: "Invalid or expired password reset token" });
+    }
+
+    const hash = await bcrypt.hash(password, Number(process.env.BCRYPT_SALT));
+
+    await User.updateOne(
+      { _id: userId },
+      { $set: { password: hash } },
+      { new: true }
+    );
+
+    const user = await User.findById({ _id: userId });
+
+    sendEmail(
+      user.email,
+      "Password Reset Successfully",
+      {
+        name: user.fullName,
+      },
+      "/views/template/resetPassword.ejs"
+    );
+
+    await passwordResetToken.deleteOne();
+
+    return res.json({ message: "Password reset was successful" });
+  } catch (error) {
+    return res.status(500).json(error);
   }
-
-  const isValid = await bcrypt.compare(token, passwordResetToken.token);
-
-  if (!isValid) {
-    res
-      .status(404)
-      .json({ message: "Invalid or expired password reset token" });
-  }
-
-  const hash = await bcrypt.hash(password, Number(process.env.BCRYPT_SALT));
-
-  await User.updateOne(
-    { _id: userId },
-    { $set: { password: hash } },
-    { new: true }
-  );
-
-  const user = await User.findById({ _id: userId });
-
-  sendEmail(
-    user.email,
-    "Password Reset Successfully",
-    {
-      name: user.fullName,
-    },
-    "/views/template/resetPassword.ejs"
-  );
-
-  await passwordResetToken.deleteOne();
-
-  return res.json({ message: "Password reset was successful" });
 };
