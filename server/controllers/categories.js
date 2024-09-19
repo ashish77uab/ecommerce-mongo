@@ -18,7 +18,7 @@ export const createCategory = async (req, res) => {
       return res.status(400).json({ message: "the category cannot be created!" });
     res.status(201).json(category);
   } catch (error) {
-    return res.status(500).json(error);
+    return res.status(500).json({message: 'Internal server error'});
   }
 };
 export const getCategory = async (req, res) => {
@@ -31,7 +31,7 @@ export const getCategory = async (req, res) => {
     }
     res.status(200).json(category);
   } catch (error) {
-    return res.status(500).json(error);
+    return res.status(500).json({message: 'Internal server error'});
   }
 };
 export const getAllCategory = async (req, res) => {

@@ -19,7 +19,7 @@ export const createSubCategory = async (req, res) => {
 
    res.status(201).json(category);
  } catch (error) {
-   return res.status(500).json(error);
+   return res.status(500).json({message: 'Internal server error'});
  }
 };
 export const getSubCategory = async (req, res) => {
@@ -32,7 +32,7 @@ export const getSubCategory = async (req, res) => {
    }
    res.status(200).json(category);
  } catch (error) {
-   return res.status(500).json(error);
+   return res.status(500).json({message: 'Internal server error'});
  }
 };
 export const getAllSubCategory = async (req, res) => {
@@ -45,7 +45,7 @@ export const getAllSubCategory = async (req, res) => {
    }
    res.status(200).json(categoryList);
  } catch (error) {
-   return res.status(500).json(error);
+   return res.status(500).json({message: 'Internal server error'});
  }
 };
 export const getAllSubCategories = async (req, res) => {
@@ -57,7 +57,7 @@ export const getAllSubCategories = async (req, res) => {
       }
       res.status(200).json(categoryList);
     } catch (error) {
-      return res.status(500).json(error);
+      return res.status(500).json({message: 'Internal server error'});
     }
   };
 export const updateSubCategory = async (req, res) => {
@@ -90,7 +90,7 @@ export const updateSubCategory = async (req, res) => {
      return res.status(400).json({ message: "the category cannot be updated!" });
    res.status(201).json(category);
  } catch (error) {
-   return res.status(500).json(error);
+   return res.status(500).json({message: 'Internal server error'});
  }
 };
 export const deleteSubCategory = async (req, res) => {
@@ -127,7 +127,7 @@ export const deleteSubCategory = async (req, res) => {
     }
 
   } catch (error) {
-    return res.status(500).json(error);
+    return res.status(500).json({message: 'Internal server error'});
 
   }
 };

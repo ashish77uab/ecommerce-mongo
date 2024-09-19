@@ -27,7 +27,7 @@ export const createBanner = async (req, res) => {
 
    res.status(201).json(banner);
  } catch (error) {
-   return res.status(500).json(error);
+   return res.status(500).json({message: 'Internal server error'});
  }
 };
 export const getAllBanner = async (req, res) => {
@@ -49,7 +49,7 @@ export const getAllBanner = async (req, res) => {
 
    res.status(200).json(tempBanner);
  } catch (error) {
-   return res.status(500).json(error);
+   return res.status(500).json({ message: 'Internal server error'});
   
  }
 };
@@ -90,7 +90,7 @@ export const updateBanner = async (req, res) => {
 
    res.status(201).json(banner);
  } catch (error) {
-   return res.status(500).json(error);
+   return res.status(500).json({message: 'Internal server error'});
   
  }
 };
@@ -124,7 +124,7 @@ export const deleteBannerImage = async (req, res) => {
    }
   
  } catch (error) {
-   return res.status(500).json(error);
+   return res.status(500).json({message: 'Internal server error'});
  }
 
  

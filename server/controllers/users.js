@@ -63,7 +63,7 @@ export const signin = async (req, res) => {
 
     res.status(200).json({ result: oldUser, token });
   } catch (error) {
-    return res.status(500).json(error);
+    return res.status(500).json({message: 'Internal server error'});
   }
 };
 export const uploadProfileImage = async (req, res) => {
@@ -105,7 +105,7 @@ export const uploadProfileImage = async (req, res) => {
 
     res.status(200).json(newUser);
   } catch (error) {
-    return res.status(500).json(error);
+    return res.status(500).json({message: 'Internal server error'});
   }
 };
 
@@ -139,7 +139,7 @@ export const signup = async (req, res) => {
     );
     res.status(201).json({ result, token });
   } catch (error) {
-    return res.status(500).json(error);
+    return res.status(500).json({message: 'Internal server error'});
   }
 };
 
@@ -162,7 +162,7 @@ export const googleSignIn = async (req, res) => {
 
     res.status(200).json({ result, token });
   } catch (error) {
-    return res.status(500).json(error);
+    return res.status(500).json({message: 'Internal server error'});
   }
 };
 export const getUser = async (req, res) => {
@@ -208,7 +208,7 @@ export const getUser = async (req, res) => {
 
     res.status(200).json(userData[0] || {}); // Send the first (and likely only) result back
   } catch (error) {
-    return res.status(500).json(error);
+    return res.status(500).json({message: 'Internal server error'});
 
   }
 };
@@ -224,7 +224,7 @@ export const getUsers = async (req, res) => {
    const users = await User.find({});
    res.status(200).json(users);
  } catch (error) {
-   return res.status(500).json(error);
+   return res.status(500).json({message: 'Internal server error'});
  }
 };
 
@@ -260,7 +260,7 @@ export const resetPasswordRequestController = async (req, res) => {
    );
    return res.json({ link });
  } catch (error) {
-   return res.status(500).json(error);
+   return res.status(500).json({message: 'Internal server error'});
  }
 };
 
@@ -307,6 +307,6 @@ export const resetPasswordController = async (req, res) => {
 
     return res.json({ message: "Password reset was successful" });
   } catch (error) {
-    return res.status(500).json(error);
+    return res.status(500).json({message: 'Internal server error'});
   }
 };

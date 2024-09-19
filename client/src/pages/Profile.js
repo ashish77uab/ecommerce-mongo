@@ -125,7 +125,7 @@ const Profile = () => {
                             <p className="md:text-base leading-[1] text-[12px] text-gray-600">
                                 {user?.email}
                             </p>
-                            <p >You have <b>{user?.levelValue}</b> points</p>
+                            <p >You have <b>{user?.levelValue||0}</b> points</p>
                             <p className="text-muted text-sm">Note: Shop more to get more points to unclock your next level</p>
                             <div className=" my-2 ">
                                 {user?.mobile && (

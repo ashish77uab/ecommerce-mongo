@@ -16,7 +16,7 @@ export const createReviewForProduct = async (req, res) => {
       return res.status(500).json({ message: "Unable to create review for this products" });
     res.status(201).json(review);
   } catch (error) {
-    return res.status(500).json(error);
+    return res.status(500).json({message: 'Internal server error'});
   }
 };
 export const createProduct = async (req, res) => {
@@ -45,7 +45,7 @@ export const createProduct = async (req, res) => {
      return res.status(500).json({ message: "Unable to create product" });
    res.status(201).json(product);
  } catch (error) {
-   return res.status(500).json(error);
+   return res.status(500).json({message: 'Internal server error'});
  }
 };
 export const getProduct = async (req, res) => {
@@ -124,7 +124,7 @@ export const getProduct = async (req, res) => {
 
    res.status(200).json(result);
  } catch (error) {
-   return res.status(500).json(error);
+   return res.status(500).json({message: 'Internal server error'});
   
  }
 };
@@ -139,7 +139,7 @@ export const getFeaturedProduct = async (req, res) => {
    }
    res.status(200).json(product);
  } catch (error) {
-   return res.status(500).json(error);
+   return res.status(500).json({message: 'Internal server error'});
  }
 };
 export const getBrands = async (req, res) => {
@@ -165,7 +165,7 @@ export const getBrands = async (req, res) => {
    }
    res.status(200).json(product);
  } catch (error) {
-   return res.status(500).json(error);
+   return res.status(500).json({message: 'Internal server error'});
  }
 };
 export const getStats = async (req, res) => {
@@ -190,7 +190,7 @@ export const getStats = async (req, res) => {
    }
    res.status(200).json({ totalProduct: productCount, totalBrands: brands });
  } catch (error) {
-   return res.status(500).json(error);
+   return res.status(500).json({message: 'Internal server error'});
  }
 };
 export const getAllProduct = async (req, res) => {
@@ -254,7 +254,7 @@ export const getAllProduct = async (req, res) => {
     // Return the filtered product list
     res.status(200).json(productList);
   } catch (err) {
-    return res.status(500).json(error);
+    return res.status(500).json({message: 'Internal server error'});
   }
 };
 export const updateProduct = async (req, res) => {
@@ -295,7 +295,7 @@ export const updateProduct = async (req, res) => {
 
    res.status(201).json(product);
  } catch (error) {
-   return res.status(500).json(error);
+   return res.status(500).json({message: 'Internal server error'});
  }
 };
 export const deleteProduct = async (req, res) => {
@@ -327,7 +327,7 @@ export const deleteProduct = async (req, res) => {
       });
 
   } catch (error) {
-    return res.status(500).json(error);
+    return res.status(500).json({message: 'Internal server error'});
   }
 
 };
@@ -358,7 +358,7 @@ export const deleteProductImage = async (req, res) => {
     }
 
   } catch (error) {
-    return res.status(500).json(error);
+    return res.status(500).json({message: 'Internal server error'});
   }
 
 

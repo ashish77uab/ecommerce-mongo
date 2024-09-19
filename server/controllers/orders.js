@@ -10,7 +10,7 @@ export const getAllOrders = async (req, res) => {
    }
    res.status(200).json(orderList);
  } catch (error) {
-   return res.status(500).json(error);
+   return res.status(500).json({message: 'Internal server error'});
  }
 };
 export const createOrder = async (req, res) => {
@@ -50,7 +50,7 @@ export const createOrder = async (req, res) => {
     if (!order) return res.status(400).send("the order cannot be created!");
     res.send(order); 
   } catch (error) {
-    return res.status(500).json(error);
+    return res.status(500).json({message: 'Internal server error'});
   }
 };
 export const removeCartItem = async (req, res) => {
@@ -65,7 +65,7 @@ export const removeCartItem = async (req, res) => {
 
    res.status(200).json(order);
  } catch (error) {
-   return res.status(500).json(error);
+   return res.status(500).json({message: 'Internal server error'});
  }
 };
 export const cancelOrder = async (req, res) => {
@@ -85,7 +85,7 @@ export const cancelOrder = async (req, res) => {
     res.status(200).json(order);
  
 } catch (error) {
-    return res.status(500).json(error);
+    return res.status(500).json({message: 'Internal server error'});
 }
 };
 export const updateOrder = async (req, res) => {
@@ -109,7 +109,7 @@ export const updateOrder = async (req, res) => {
     res.status(200).json(order);
  
 } catch (error) {
-    return res.status(500).json(error);
+    return res.status(500).json({message: 'Internal server error'});
 }
 };
 
@@ -182,7 +182,7 @@ export const getAllUserOrders = async (req, res) => {
     res.status(200).json(orders);
 
     } catch (error) {
-    return res.status(500).json(error);
+    return res.status(500).json({message: 'Internal server error'});
     }
   };
 export const getAllOrdersAdmin = async (req, res) => {
@@ -264,7 +264,7 @@ export const getAllOrdersAdmin = async (req, res) => {
     });
     } catch (error) {
       console.error(error);
-    return res.status(500).json(error);
+    return res.status(500).json({message: 'Internal server error'});
     }
   };
 export const getTotalSales = async (req, res) => {
@@ -279,7 +279,7 @@ export const getTotalSales = async (req, res) => {
 
     res.status(200).json({ totalsales: totalSales.pop().totalsales });
   } catch (error) {
-    return res.status(500).json(error);
+    return res.status(500).json({message: 'Internal server error'});
   }
 };
 export const getOrdersCount = async (req, res) => {
@@ -306,7 +306,7 @@ export const addToCart = async (req, res) => {
     res.status(200).json(orderItem);
     
   } catch (error) {
-    return res.status(500).json(error);
+    return res.status(500).json({message: 'Internal server error'});
   }
 };
 export const getAllCartItem = async (req, res) => {
@@ -321,6 +321,6 @@ export const getAllCartItem = async (req, res) => {
    }
    res.status(200).json(orderItems);
  } catch (error) {
-   return res.status(500).json(error);
+   return res.status(500).json({message: 'Internal server error'});
  }
 };
