@@ -11,7 +11,7 @@ import { Link } from "react-router-dom";
 import RenderNoData from "../components/layout/RenderNoData";
 import { BANNERS_VALUES_ONLY } from "../utils/constants";
 import HomeBannerSlider from "../components/slider/HomeBannerSlider";
-
+import {io} from 'socket.io-client'
 const Home = () => {
   const [categories, setCategories] = useState([]);
   const [skeletonLoading, setSkeletonLoading] = useState(true);

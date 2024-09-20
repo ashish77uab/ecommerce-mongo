@@ -50,6 +50,10 @@ const productSchema = mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    liveWatchCount:{
+      type: Number,
+      default: 0,
+    }
   },
   { timestamps: true }
 );

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { addToCart, addToWishList, getSingleProduct } from "../api/api";
+import { addToCart, addToWishList, getSingleProduct, socketConnect } from "../api/api";
 import ToastMsg from "../components/toast/ToastMsg";
 import { toast } from "react-toastify";
 import { imageRender, numberWithCommas } from "../utils/helpers";
@@ -11,7 +11,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { setUserWishList, updateUserCarts } from "../redux/features/authSlice";
 import { getUserToken } from "../utils/constants";
 import Spinner from "../components/loaders/Spinner";
-import RenderNoData from "../components/layout/RenderNoData";
 const ProductDetail = () => {
   const dispatch = useDispatch();
   const [active, setActive] = useState(0);
@@ -23,6 +22,21 @@ const ProductDetail = () => {
   const [wishListAdded, setWishListAdded] = useState(false);
   const [fetchLoading, setFetchLoading] = useState(false);
   const isLoggedIn = getUserToken()
+  const [viewerCount, setViewerCount] = useState(0);
+
+  useEffect(() => {
+    const socket = socketConnect('products');
+    if (id && isLoggedIn && user?._id) {
+        socket.emit('viewProduct', { productId: id, userId: user?._id }); 
+        socket.on('viewerCount', (count) => {
+          setViewerCount(count);
+        });
+        return () => {
+          socket.emit('leaveProduct', { productId: id, userId: user?._id });
+          socket.disconnect();
+        };
+      }
+  }, [id, isLoggedIn, user]);
   const getProduct = async (id) => {
     setFetchLoading(true)
     try {
@@ -39,12 +53,14 @@ const ProductDetail = () => {
       setFetchLoading(false)
     }
   };
-
-  useEffect(() => {
-    if (id) {
+  useEffect(()=>{
+    if(id){
       getProduct(id);
     }
-  }, [id]);
+    
+  },[id])
+
+ 
 
   useEffect(() => {
     if (user) {
@@ -123,7 +139,8 @@ const ProductDetail = () => {
           <div className="container">
             <div className="flex md:flex-row flex-col gap-10">
               <div className="relative max-w-[600px] w-full bg-zinc-100 ">
-                <div className="w-full md:h-[450px] h-[350px]  lg:h-[600px] rounded-md overflow-hidden bg-zinc-300">
+                <div className="w-full md:h-[450px] h-[350px]  lg:h-[600px] rounded-md overflow-hidden bg-zinc-300 relative">
+                  {isLoggedIn && <div className="absolute top-1 right-1 rounded-full bg-amber-200  py-2 px-4 z-[10] flex items-center gap-2  text-amber-800"><span className="text-2xl">{reactIcons.eye}</span> <span className="font-semibold">{viewerCount}</span></div>}
                   <img
                     className="w-full h-full object-contain hoverable-img"
                     src={imageRender(product?.images?.[active])}
@@ -237,4 +254,4 @@ const ProductDetail = () => {
   );
 };
 
-export default ProductDetail;
+export default ProductDetail

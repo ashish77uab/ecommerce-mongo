@@ -107,6 +107,7 @@ export const getProduct = async (req, res) => {
          richDescription: { $first: "$richDescription" },
          price: { $first: "$price" },
          countInStock: { $first: "$countInStock" },
+         liveWatchCount: { $first: "$liveWatchCount" },
          numReviews: { $first: "$numReviews" },
          isFeatured: { $first: "$isFeatured" },
          images: { $first: "$images" },
@@ -362,4 +363,29 @@ export const deleteProductImage = async (req, res) => {
   }
 
 
+};
+export const updateProductCount = async (productId, count) => {
+  try {
+    // Check if productId is valid
+    if (!mongoose.isValidObjectId(productId)) {
+      return { status: 400, message: "Invalid Product Id" };
+    }
+
+    // Update the product's liveWatchCount
+    const product = await Product.findByIdAndUpdate(
+      productId,
+      { $set: { liveWatchCount: count } },
+      { new: true } // Option to return the updated product
+    );
+
+    // Check if product was found and updated
+    if (!product) {
+      return { status: 404, message: "Product not found" };
+    }
+
+    return { status: 200, product };
+  } catch (error) {
+    // Handle errors and return error message
+    return { status: 500, message: error.message };
+  }
 };

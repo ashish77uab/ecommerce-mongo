@@ -12,6 +12,10 @@ import wishListRoutes from "./routes/wishlist.js";
 import upload from "./middleware/upload.js";
 import dotenv from "dotenv";
 import morgan from "morgan";
+import http from "http";
+import { Server } from "socket.io";
+import { updateProductCount } from "./controllers/products.js";
+
 dotenv.config();
 const app = express();
 app.use(express.json());
@@ -24,6 +28,12 @@ app.set("view engine", "ejs");
 app.set("views", "./views");
 const PORT = process.env.PORT || 5000;
 mongoose.set("strictQuery", false);
+const server = http.createServer(app)
+const io = new Server(server, {
+  cors: {
+    origin: '*', 
+  }
+});
 
 // routes
 app.use("/auth", userRoutes);
@@ -42,8 +52,58 @@ mongoose
     useUnifiedTopology: true,
   })
   .then(() =>
-    app.listen(PORT, () =>
+    server.listen(PORT, () =>
       console.log(`Server Running on Port: http://localhost:${PORT}`)
     )
   )
   .catch((error) => console.log(`${error} did not connect`));
+
+const productViewers = {}; // productId: Set of userIds
+const productNamespace = io.of("/products");
+productNamespace.on('connection', (socket) => {
+  // When a user views a product
+  socket.on('viewProduct', async ({ productId, userId }) => {
+    // await updateProductCount(productId, productViewers[productId]?.length)
+    if (!productViewers[productId]) {
+      productViewers[productId] = [userId];
+    } else {
+      if (!productViewers[productId]?.includes(userId)){
+        productViewers[productId].push(userId);
+      }else{
+        productViewers[productId] = productViewers[productId].filter(Id => Id !== userId)
+      }
+       
+    }
+    socket.join(productId);
+    productNamespace.to(productId).emit('viewerCount', productViewers[productId]?.length);
+    
+  });
+
+  // When a user leaves the product or disconnects
+  socket.on('leaveProduct', async ({ productId, userId }) => {
+    if (productViewers[productId]) {
+      productViewers[productId]= productViewers[productId].filter(Id=>Id!==userId); // Remove userId from the set
+      productNamespace.to(productId).emit('viewerCount', productViewers[productId]?.length);
+      // await updateProductCount(productId, productViewers[productId]?.length)
+    }
+  });
+
+  socket.on('disconnect', () => {
+    console.log('A user disconnected');
+  });
+});
+
+// const orderNamespace = io.of("/orders");
+
+// orderNamespace.on("connection", (socket) => {
+//   console.log("Connected to orders namespace", socket.id);
+
+//   socket.on("orderEvent", (data) => {
+//     console.log("Order event received:", data);
+//     // Handle order-related socket events here
+//   });
+
+//   socket.on("disconnect", () => {
+//     console.log("A user disconnected from the orders namespace");
+//   });
+// });
