@@ -65,7 +65,7 @@ const UpdateOrderStatus = ({ isOpen, closeModal, formData, fetchData }) => {
         fetchData()
       
         if (socketRef.current) {
-          socketRef.current.emit('send-notification', { userId: formData?.userId, message :message});
+          socketRef.current?.emit('send-notification', { userId: formData?.userId, message :message});
 
         } else {
           toast.error(<ToastMsg title="Unable to connect to the server. Please try again later." />);

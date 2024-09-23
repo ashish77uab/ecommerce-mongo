@@ -242,7 +242,7 @@ const Profile = () => {
                                         })}
                                 </div>
 
-                                {user?.vouchers.length === 0 && <div>No vouchers found.</div>}
+                                {user?.vouchers?.length === 0 && <div>No vouchers found.</div>}
 
 
 

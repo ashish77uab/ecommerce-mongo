@@ -14,6 +14,7 @@ const authSlice = createSlice({
       totalNotifications: 0,
     },
     notificationsLoading: false,
+    updateLoading: false,
     isNewNotification: isNewNotification
   },
   reducers: {
@@ -47,18 +48,18 @@ const authSlice = createSlice({
       state.user = null;
     },
     deleteNotificationStart: (state, action) => {
-      state.notificationsLoading = true;
+      state.updateLoading = true;
     },
     deleteNotificationComplete: (state, action) => {
       state.notifications = action.payload;
-      state.notificationsLoading = false;
+      state.updateLoading = false;
     },
     readNotificationStart: (state, action) => {
-      state.notificationsLoading = true;
+      state.updateLoading = true;
     },
     readNotificationComplete: (state, action) => {
       state.notifications = action.payload;
-      state.notificationsLoading = false;
+      state.updateLoading = false;
     },
     getUserNotifcationStart: (state, action) => {
       state.notificationsLoading = true;

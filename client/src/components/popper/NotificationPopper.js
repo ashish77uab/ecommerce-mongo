@@ -10,7 +10,7 @@ import RenderNoData from '../layout/RenderNoData'
 
 const NotificationPopper = ({ dispatch }) => {
     const newNotificationCount = localStorage?.getItem('notificationCount') || 0
-    const { notifications, notificationsLoading, isNewNotification } = useSelector((state) => state.auth);
+    const { notifications, notificationsLoading, updateLoading, isNewNotification } = useSelector((state) => state.auth);
     const isLoggedIn = getUserToken()
 
     const handleResetNewCount = (id) => {
@@ -87,10 +87,10 @@ const NotificationPopper = ({ dispatch }) => {
                                                         </p>
                                                     </div>
                                                     <div className='flex items-center gap-2'>
-                                                        <button onClick={() => handleRead(item?._id)} className='w-[28px] h-[28px] bg-zinc-200 text-base text-blue-800 rounded-md flex-center'>
+                                                        <button disabled={updateLoading} onClick={() => handleRead(item?._id)} className='w-[28px] h-[28px] bg-zinc-200 text-base text-blue-800 rounded-md flex-center'>
                                                             {item?.isRead?reactIcons.check :reactIcons?.dotFill}
                                                         </button>
-                                                        <button onClick={() => handleDelete(item?._id)} className='w-[28px] h-[28px] bg-red-200 text-base text-red-800 rounded-md flex-center'>
+                                                        <button disabled={updateLoading} onClick={() => handleDelete(item?._id)} className='w-[28px] h-[28px] bg-red-200 text-base text-red-800 rounded-md flex-center'>
                                                             {reactIcons.trash}
                                                         </button>
                                                     </div>

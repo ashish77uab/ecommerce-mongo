@@ -104,6 +104,7 @@ const notificationNamespaces = io.of("/notifications");
 notificationNamespaces.on("connection", (socket) => {
 
   socket.on("connect-notification",async ({userId}) => {
+    console.log(userId,'userId')
     socket.join(userId);
   });
   socket.on("send-notification-admin", async ({ userId, voucherId }) => {

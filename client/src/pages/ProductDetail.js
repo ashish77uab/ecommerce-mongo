@@ -13,6 +13,9 @@ import { getUserToken } from "../utils/constants";
 import Spinner from "../components/loaders/Spinner";
 const ProductDetail = () => {
   const socketRef = useRef()
+  if (!socketRef.current) {
+    socketRef.current = socketConnect('products');
+  }
   const dispatch = useDispatch();
   const [active, setActive] = useState(0);
   const [quantity, setQuantity] = useState(1);
@@ -26,9 +29,6 @@ const ProductDetail = () => {
   const [viewerCount, setViewerCount] = useState(0);
 
   useEffect(() => {
-    if(!socketRef.current){
-      socketRef.current = socketConnect('products');
-    }
     if (id && isLoggedIn && user?._id) {
         socketRef.current?.emit('viewProduct', { productId: id, userId: user?._id }); 
         socketRef.current?.on('viewerCount', (count) => {

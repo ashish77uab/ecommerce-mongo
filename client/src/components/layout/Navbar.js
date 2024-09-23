@@ -9,8 +9,10 @@ import { socketConnect } from "../../api/api";
 import NotificationPopper from "../popper/NotificationPopper";
 
 const Navbar = () => {
-  const socketRef=useRef()
- 
+  let socket
+  if (!socket) {
+    socket = socketConnect('notifications');
+  }
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const {  user } = useSelector((state) => state.auth);
@@ -31,17 +33,15 @@ const Navbar = () => {
   useEffect(() => {
    
     if (isLoggedIn && user?._id) {
-      if (!socketRef.current){
-        socketRef.current = socketConnect('notifications');
-      }
-      socketRef.current?.emit('connect-notification', { userId: user?._id });
-      socketRef.current?.on('notify-user', (data) => {
+     socket?.emit('connect-notification', { userId: user?._id });
+     socket?.on('notify-user', (data) => {
         handleUpdateNotificationCount()
         dispatch(updateNotification(data))
       });
     }
     return () => {
-      socketRef.current?.disconnect();
+     socket?.disconnect();
+     socket?.off('notify-user');
     };
   }, [isLoggedIn, user]);
 
