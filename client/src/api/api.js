@@ -56,6 +56,8 @@ export const deleteProductImage = (id, formData) =>
   API.put(`products/delete-product-image/${id}`, formData);
 export const addProductReview = ( formData) =>
   API.post(`products/add-product-review`, formData);
+export const editProductReview = (id, formData) =>
+  API.put(`products/edit-product-review/${id}`, formData);
 
 export const addToCart = (formData) => API.post("orders/add-to-cart", formData);
 export const getCartItems = () => API.get("orders/cart-items");

@@ -12,6 +12,7 @@ import {
   getProduct,
   getStats,
   updateProduct,
+  editReviewForProduct
 } from "../controllers/products.js";
 import { authenticateJWT } from "../middleware/auth.js";
 
@@ -21,6 +22,7 @@ router.get(`/stats`, getStats);
 router.get(`/brands`, getBrands);
 router.get(`/:id`, getProduct);
 router.post("/add-product-review", authenticateJWT,createReviewForProduct);
+router.put("/edit-product-review/:reviewId", authenticateJWT, editReviewForProduct);
 router.post(`/`, upload.array("images", 10), createProduct);
 router.put("/:id",upload.array("images", 10), updateProduct);
 router.delete("/:id", deleteProduct);

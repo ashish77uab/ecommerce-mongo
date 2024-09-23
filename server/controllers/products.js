@@ -4,6 +4,23 @@ import mongoose from "mongoose";
 import { deleteFileFromCloudinary, uploadImageToCloudinary } from "../helpers/functions.js";
 import Review from "../models/Review.js";
 
+export const editReviewForProduct = async (req, res) => {
+  try {
+    const reviewId = req.params?.reviewId
+    const review = await Review.findByIdAndUpdate(
+      reviewId,
+      {
+        ...req?.body,
+      },
+      { new: true }
+    );
+    if (!review)
+      return res.status(500).json({ message: "Unable to update review for this product" });
+    res.status(200).json(review);
+  } catch (error) {
+    return res.status(500).json({message: 'Internal server error'});
+  }
+};
 export const createReviewForProduct = async (req, res) => {
   try {
     const user = req.user

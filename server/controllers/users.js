@@ -209,14 +209,44 @@ export const getUser = async (req, res) => {
         },
       },
       {
+        $addFields: {
+          vouchers: {
+            $map: {
+              input: "$vouchers", // Loop through each voucher in the array
+              as: "voucher",
+              in: {
+                $mergeObjects: [
+                  "$$voucher", // Keep all existing fields of the voucher
+                  {
+                    usedVoucher: {
+                      $cond: {
+                        if: {
+                          $and: [
+                            { $isArray: "$$voucher.usersUsed" }, // Check if usersUsed is an array
+                            { $gt: [{ $size: "$$voucher.usersUsed" }, 0] }, // Ensure usersUsed array is not empty
+                          ],
+                        },
+                        then: { $in: [mongoose.Types.ObjectId(user.id), "$$voucher.usersUsed"] }, // Check if userId is in usersUsed array
+                        else: false, // If usersUsed is not an array or empty, usedVoucher is false
+                      },
+                    },
+                  },
+                ],
+              },
+            },
+          },
+        },
+      },
+      {
         $project: {
-          password: 0, // Exclude the password field
+          password: 0, 
         },
       },
     ]);
 
     res.status(200).json(userData[0] || {}); // Send the first (and likely only) result back
   } catch (error) {
+    console.log(error);
     return res.status(500).json({ message: 'Internal server error' });
 
   }

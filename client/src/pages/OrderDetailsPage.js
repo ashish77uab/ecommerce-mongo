@@ -3,6 +3,7 @@ import {
   addProductReview,
   cancelOrder,
   getAllUserOrders,
+  editProductReview
 } from "../api/api";
 import ToastMsg from "../components/toast/ToastMsg";
 import { toast } from "react-toastify";
@@ -13,13 +14,17 @@ import RenderNoData from "../components/layout/RenderNoData";
 import Spinner from "../components/loaders/Spinner";
 import StarRating from "../components/forms/StarRating";
 import TextInput from "../components/forms/TextInput";
+import ActionButton from "../components/button/ActionButton";
+import { reactIcons } from "../utils/icons";
 
 const WishlistDetail = () => {
+  const [isUpdate,setIsUpdate]=useState(false)
   const navigate = useNavigate();
   const user = useSelector((state) => state.auth.user);
   const [orders, setOrders] = useState(null);
   const [fetchLoading, setFetchLoading] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [reviewId, setReviewId] = useState(null);
   const [isReviewOpen, setIsReviewOpen] = useState(false);
   const [productId, setProductId] = useState(false);
   const [text, setText] = useState('');
@@ -44,7 +49,7 @@ const WishlistDetail = () => {
   const handleReviewOrder = async (id) => {
     setLoading(true)
     try {
-      const res = await addProductReview({ product: id, rating: rating, text: text });
+      const res = isUpdate ? await editProductReview(reviewId, { product: id, rating: rating, text: text })  : await addProductReview({ product: id, rating: rating, text: text });
       const { status, data } = res;
       if (status >= 200 && status <= 300) {
         toast.success(<ToastMsg title={'Added Successfully'} />);
@@ -52,6 +57,7 @@ const WishlistDetail = () => {
         setText('')
         setRating(0)
         setIsReviewOpen(false)
+        setReviewId('')
         getOrderDetailsData()
       } else {
         toast.error(<ToastMsg title={data.message} />);
@@ -139,15 +145,29 @@ const handleCancelOrder = async (id) => {
                                 <span className="mr-2">Quantity:</span>
                                 <b>{product?.quantity}</b>
                               </div>
-                              {product?.productDetails?.hasReviewed &&
-                                <div className="mb-2">
-                                  <StarRating
-                                    readonly={true}
-                                    rating={product?.productDetails?.averageRating}
-                                  />
-                                </div>
+                              {product?.productDetails?.hasReviewed && !isReviewOpen &&
+                              <div>
+                                  <div className="mb-0 flex items-center gap-2">
+                                    <StarRating
+                                      readonly={true}
+                                      rating={product?.productDetails?.averageRating}
+                                    />
+                                    {product?.productDetails?.hasReviewed == true && order?.status === 'Delivered' &&
+                                      <ActionButton onClick={() => {
+                                        setIsReviewOpen(prev => !prev)
+                                        setProductId(prev => prev === product.product ? null : product.product)
+                                        setRating(product?.productDetails?.userReview?.rating)
+                                        setText(product?.productDetails?.userReview?.text)
+                                        setIsUpdate(prev => !prev)
+                                        setReviewId(product?.productDetails?.userReview?._id)
+                                      }}>
+                                        {reactIcons.edit}
+                                      </ActionButton>}
+                                  </div>
+                                  <p className="mb-2">{product?.productDetails?.userReview?.text}</p>
+                              </div>
                               }
-                              {product?.productDetails?.hasReviewed == false && productId === product?.product && <div className="my-2">
+                              { productId === product?.product && <div className="my-2">
                                 <div >
                                   <StarRating
                                     handleRating={setRating}
@@ -171,12 +191,14 @@ const handleCancelOrder = async (id) => {
                                 }} className="btn-outline-primary btn-sm py-[6px] px-6 inline-flex my-2">
                                   Add Review
                                 </div>}
-                                {productId === product?.product && product?.productDetails?.hasReviewed == false && (
+                                {productId === product?.product && (
                                   <>
                                     <div onClick={(e) => {
                                       setIsReviewOpen(prev => !prev)
                                       setProductId(prev => prev === product.product ? null : product.product)
                                       e.stopPropagation()
+                                      setRating('')
+                                      setText('')
                                     }} className="btn-outline-primary btn-sm py-[6px] px-6 inline-flex my-2">
                                       Cancel
                                     </div>
@@ -184,7 +206,7 @@ const handleCancelOrder = async (id) => {
                                       handleReviewOrder(product.product)
                                       e.stopPropagation()
                                     }} className="btn-green btn-sm py-[6px] px-6 inline-flex my-2">
-                                      Submit
+                                      {setIsUpdate? 'Update' : 'Submit'}
                                     </div>
 
                                   </>

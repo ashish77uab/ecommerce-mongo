@@ -54,7 +54,8 @@ export const createOrder = async (req, res) => {
     await OrderItem.updateMany({ user: user.id }, { isPlaced: true });
     if (!order) return res.status(400).send("the order cannot be created!");
     if (req.body?.voucherId){
-      const voucher = await Voucher.findByIdAndUpdate(req.body?.voucherId, { $inc: { usageLimit: -1 } }, { new: true });
+      const voucher = await Voucher.findByIdAndUpdate(req.body?.voucherId, { $inc: { usageLimit: -1 }, $push: { usersUsed: mongoose.Types.ObjectId(user.id) } }, { new: true });
+      
       if (!voucher) {
         return res.status(400).json({ message: 'Voucher could not updated' });
       }
@@ -187,6 +188,18 @@ export const getAllUserOrders = async (req, res) => {
               then: true,
               else: false,
             },
+          },
+          "productsList.productDetails.userReview": {
+            $arrayElemAt: [
+              {
+                $filter: {
+                  input: "$productsList.productDetails.reviews",
+                  as: "review",
+                  cond: { $eq: ["$$review.user", mongoose.Types.ObjectId(userId)] }, // Find the review made by the current user
+                },
+              },
+              0,
+            ],
           },
         },
       },

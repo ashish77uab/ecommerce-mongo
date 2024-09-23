@@ -36,7 +36,7 @@ const ViewUsersVouchers = ({ isOpen, closeModal, vouchers, }) => {
               leaveTo="opacity-0 scale-95"
             >
               <Dialog.Panel
-                className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all"
+                className="w-full max-w-xl transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all"
               >
                 <Dialog.Title as="h4" className="heading-4 text-center">
                   Users Vouchers
@@ -44,8 +44,8 @@ const ViewUsersVouchers = ({ isOpen, closeModal, vouchers, }) => {
                 <div className="mt-2 min-h-[400px]">
                   <div className=" w-full">
                     <div className="py-6">
-                      <div className="flex items-center gap-1 py-1">
-                        <b className="flex-1">SR. No</b>
+                      <div className="flex items-center gap-1 py-2">
+                        <b className="w-[80px]">SR. No</b>
                         <b className="flex-1">Voucher Name</b>
                         <b className="flex-1">Code</b>
                       </div>
@@ -53,7 +53,7 @@ const ViewUsersVouchers = ({ isOpen, closeModal, vouchers, }) => {
                         {
                           vouchers.map((voucher, index) => (
                             <div key={index} className="flex items-center gap-1">
-                              <div className="flex-1">{index+1}</div>
+                              <div className="w-[80px]">{index+1}</div>
                               <div className="flex-1">{voucher.name}</div>
                               <div className="flex-1">{voucher.code}</div>
                             </div>

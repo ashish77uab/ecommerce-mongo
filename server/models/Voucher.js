@@ -15,6 +15,14 @@ const voucherSchema = mongoose.Schema(
             {
                 type: mongoose.Schema.Types.ObjectId,
                 ref: "User",
+                default: []
+            },
+        ],
+        usersUsed: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "User",
+                default: []
             },
         ],
         discountValue: {

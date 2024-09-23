@@ -172,9 +172,9 @@ const Profile = () => {
                     <div className="mb-2 p-0 lg:p-8 rounded-md grid grid-cols-1 md:grid-cols-1 lg:grid-cols-3 gap-4">
                         {LEVEL_POINTS?.map(((level,index)=>{
                             return (
-                                <div key={level} className={`border border-amber-700   rounded-md p-4 md:px-6 px-2 md:p-6 ${user?.levelValue >= level?.points &&'bg-amber-700 text-white'}`}>
+                                <div key={level} className={`border border-amber-700   rounded-md p-4 md:px-6 px-2 md:p-6 ${user?.levelValue >= level?.points &&'bg-gradient-to-r from-amber-700 to-amber-900 text-white'}`}>
                                     <h3 className="md:text-3xl text-xl text-center font-semibold">{level?.level}</h3>
-                                    <p className="md:text-lg text-base text-center font-semibold">Rewards: {level?.points} points</p>
+                                    <p className="md:text-lg text-base text-center font-semibold">Rewards at : <span className="font-semibold">{level?.points}</span> points</p>
                                     {user?.levelValue >= level?.points && <p className="text-[12px] opacity-80 text-center font-semibold">You have covered {level?.level}, shop more to reach another level</p>}
                                 </div>
                             ) 
@@ -185,23 +185,25 @@ const Profile = () => {
                     <div>
                         <div className=" w-full max-w-2xl">
                             <div>
-                                <h4 className="heading-4 inline-block py-2 ">Your Rewards</h4>
+                                <h4 className="md:heading-4  heading-7 inline-block py-2 ">Your Rewards</h4>
                             </div>
                             <div className="">
-                                <div className="flex items-center gap-1 py-2 px-4">
+                                <div className="flex items-center gap-1 py-4 px-4">
                                     <b className="flex-1">Voucher Name</b>
                                     <b className="flex-1">Code</b>
                                     <b className="flex-1">Expired At</b>
                                     <b className="flex-1"></b>
                                 </div>
-                                <div className="space-y-1">
+                                <div className="space-y-2">
                                     {
                                         user?.vouchers.map((voucher, index) => {
                                             const isExpired = moment().isAfter(moment(voucher?.expirationDate));
+                                            const isUsed = voucher?.usedVoucher;
+                                            const showExpiredAndUsed = isUsed || isExpired
                                             return (
-                                                <div key={index} className={`flex items-center relative gap-1 py-4 bg-gray-200 rounded-md px-4 ${isExpired && ' pointer-events-none'}`}>
-                                                   { isExpired && <div className="a-center text-red-600 font-bold text-2xl z-10">Expired</div>}
-                                                    <div className={`flex w-full items-center relative gap-1  ${isExpired && 'opacity-20 select-none  pointer-events-none'}`}>
+                                                <div key={index} className={`flex items-center relative gap-1 py-6 bg-amber-200 rounded-md px-4 ${showExpiredAndUsed && ' pointer-events-none'}`}>
+                                                    {isExpired ? <div className="a-center text-red-600 font-bold text-2xl z-10">Expired</div> : isUsed ? <div className="a-center text-red-600 font-bold text-2xl z-10">Used</div>:null}
+                                                    <div className={`flex w-full items-center relative gap-1  ${showExpiredAndUsed && 'opacity-20 select-none  pointer-events-none'}`}>
                                                         <div className="flex-1">{voucher.name}</div>
                                                         <b className="flex-1">{voucher.code}</b>
                                                         <div className="flex-1 text-sm">{moment(voucher?.expirationDate).format('MMM, DD YYYY, hh:mm a')}</div>
@@ -215,7 +217,7 @@ const Profile = () => {
                                                                         setisCopied(false)
                                                                     }, 2000);
                                                                 }}>
-                                                                <button className="px-6 flex-center py-[6px] bg-gray-800 text-sm font-semibold rounded-md  text-white">{isCopied && selectedVoucher === voucher?.code ? 'Copied' : 'Copy'} {isCopied && selectedVoucher === voucher?.code && <span className="ml-1">{reactIcons?.check}</span>}  </button>
+                                                                <button className="px-6 flex-center py-[6px] bg-amber-500 text-sm font-semibold rounded-md  text-white">{isCopied && selectedVoucher === voucher?.code ? 'Copied' : 'Copy'} {isCopied && selectedVoucher === voucher?.code && <span className="ml-1">{reactIcons?.check}</span>}  </button>
                                                             </CopyToClipboard>
                                                         </div>
                                                     </div>
