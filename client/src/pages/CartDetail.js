@@ -23,6 +23,7 @@ const CartDetail = () => {
   const dispatch = useDispatch();
   const [cartData, setCartData] = useState(null);
   const [voucherCode, setVoucherCode] = useState(null);
+  const [voucherId, setVoucherId] = useState(null);
   const [form, setForm] = useState(initialState);
   const [error, setError] = useState(initialState);
   const [loading, setLoading] = useState(false);
@@ -81,7 +82,8 @@ const CartDetail = () => {
       let formData = {
         ...form,
         productsList: cartData.map((item) => item.product._id),
-        discountValue
+        discountValue,
+        voucherId
       };
       const res = await placeOrder(formData);
       const { status, data } = res;
@@ -108,7 +110,8 @@ const CartDetail = () => {
       const res = await checkVoucherCode({ voucherCode, totalPrice });
       const { status, data } = res;
       if (status >= 200 && status <= 300) {
-        setDiscountValue(data)
+        setDiscountValue(data?.discountValue)
+        setVoucherId(data?.voucherId)
 
       }
     } catch (error) {

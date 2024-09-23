@@ -200,7 +200,7 @@ const Profile = () => {
                                             const isExpired = moment().isAfter(moment(voucher?.expirationDate));
                                             return (
                                                 <div key={index} className={`flex items-center relative gap-1 py-4 bg-gray-200 rounded-md px-4 ${isExpired && ' pointer-events-none'}`}>
-                                                   { isExpired && <div className="a-center font-bold text-2xl z-10">Expired</div>}
+                                                   { isExpired && <div className="a-center text-red-600 font-bold text-2xl z-10">Expired</div>}
                                                     <div className={`flex w-full items-center relative gap-1  ${isExpired && 'opacity-20 select-none  pointer-events-none'}`}>
                                                         <div className="flex-1">{voucher.name}</div>
                                                         <b className="flex-1">{voucher.code}</b>

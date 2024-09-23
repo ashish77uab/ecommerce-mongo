@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { Fragment } from "react";
 import { addCategory, socketConnect, updateCategory, updateOrderStatus } from "../../api/api";
@@ -30,12 +30,14 @@ const statusArray=[
 ]
 
 const UpdateOrderStatus = ({ isOpen, closeModal, formData, fetchData }) => {
-  const socket = socketConnect('notifications');
+  const socketRef=useRef()
+   socketRef.current = socketConnect('notifications');
   const [status, setStatus] = useState(statusArray[0])
   const [message, setMessage] = useState('')
 
   const handleReset = () => {
     closeModal();
+    setMessage('')
   };
   useEffect(( )=>{
     if (formData && formData.status) {
@@ -59,8 +61,8 @@ const UpdateOrderStatus = ({ isOpen, closeModal, formData, fetchData }) => {
         handleReset();
         fetchData()
       
-        if (socket) {
-          socket.emit('send-notification', { userId: formData?.userId, message :message});
+        if (socketRef.current) {
+          socketRef.current.emit('send-notification', { userId: formData?.userId, message :message});
 
         } else {
           toast.error(<ToastMsg title="Unable to connect to the server. Please try again later." />);

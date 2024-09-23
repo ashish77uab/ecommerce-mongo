@@ -87,9 +87,15 @@ export const checkVoucherCode = async (req, res) => {
     const isDiscounted = discountedValue < voucher?.maxDiscountValue
     
     if (isDiscounted){
-      res.status(200).json(discountedValue);
+      res.status(200).json({
+        discountValue: discountedValue,
+        voucherId: voucher?._id
+});
     }else{
-      res.status(200).json(voucher?.maxDiscountValue);
+      res.status(200).json({
+        discountValue: voucher?.maxDiscountValue,
+        voucherId: voucher?._id
+      });
     }
   } catch (error) {
     console.log(error)

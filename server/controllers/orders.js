@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import Order from "../models/Order.js";
 import OrderItem from "../models/OrderItem.js";
 import User from "../models/User.js";
+import Voucher from "../models/Voucher.js";
 export const getAllOrders = async (req, res) => {
  try {
    const orderList = await Order.find().populate("user").sort({ createdAt: -1 });
@@ -36,6 +37,7 @@ export const createOrder = async (req, res) => {
     if (req.body?.discountValue){
       totalPrice = totalPrice - req.body?.discountValue
     }
+    
 
     let order = new Order({
       productsList: orderItemsIds,
@@ -51,6 +53,13 @@ export const createOrder = async (req, res) => {
     order = await order.save();
     await OrderItem.updateMany({ user: user.id }, { isPlaced: true });
     if (!order) return res.status(400).send("the order cannot be created!");
+    if (req.body?.voucherId){
+      const voucher = await Voucher.findByIdAndUpdate(req.body?.voucherId, { $inc: { usageLimit: -1 } }, { new: true });
+      if (!voucher) {
+        return res.status(400).json({ message: 'Voucher could not updated' });
+      }
+    }
+    
     res.send(order); 
   } catch (error) {
     return res.status(500).json({message: 'Internal server error'});

@@ -43,7 +43,7 @@ const voucherSchema = mongoose.Schema(
 
         usageLimit: {
             type: Number,
-            default: 1
+            default: 0
         }, // How many times a voucher can be used
     },
     { timestamps: true }
