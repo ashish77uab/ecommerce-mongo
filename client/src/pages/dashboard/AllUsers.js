@@ -142,6 +142,7 @@ const AllUsers = () => {
         isOpen={isSendNotificationOpen}
         closeModal={() => {
           setIsSendNotificationOpen(false)
+          getAllUsers()
           
         }}
         title={"Send Notification"}

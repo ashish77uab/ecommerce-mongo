@@ -1,5 +1,5 @@
 import { Menu, Transition } from "@headlessui/react";
-import { Fragment, useEffect } from "react";
+import { Fragment, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { reactIcons } from "../../utils/icons";
 import { getUserNotifcationStart, setLogout, toggleNewNotification, updateNotification } from "../../redux/features/authSlice";
@@ -9,7 +9,8 @@ import { socketConnect } from "../../api/api";
 import NotificationPopper from "../popper/NotificationPopper";
 
 const Navbar = () => {
-  
+  const socketRef=useRef()
+ 
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const {  user } = useSelector((state) => state.auth);
@@ -28,16 +29,17 @@ const Navbar = () => {
     dispatch(toggleNewNotification(true))
   }
   useEffect(() => {
-    const socket = socketConnect('notifications');
+   
     if (isLoggedIn && user?._id) {
-      socket.emit('connect-notification', { userId: user?._id });
-      socket.on('notify-user', (data) => {
+      socketRef.current = socketConnect('notifications');
+      socketRef.current?.emit('connect-notification', { userId: user?._id });
+      socketRef.current?.on('notify-user', (data) => {
         handleUpdateNotificationCount()
         dispatch(updateNotification(data))
       });
     }
     return () => {
-      socket.disconnect();
+      socketRef.current?.disconnect();
     };
   }, [isLoggedIn, user]);
 

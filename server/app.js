@@ -117,7 +117,7 @@ notificationNamespaces.on("connection", (socket) => {
         console.log("Something went wrong while updating voucher");
         return;
       }
-      const message = `You have got one voucher with a code ${updatedVoucher?.code} valid upto ${moment(updatedVoucher?.expirationDate)?.format('MMM dd, YYYY hh:mm a')}`;
+      const message = `You have got one voucher with a code ${updatedVoucher?.code} valid upto ${moment(updatedVoucher?.expirationDate)?.format('MMM DD, YYYY hh:mm a')}`;
       const createdNotification = await Notification.create({
         user: userId,
         type: VoucherConstant?.Voucher,
