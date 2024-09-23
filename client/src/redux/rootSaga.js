@@ -1,6 +1,9 @@
-import { all } from "redux-saga/effects";
-import { categoriesSaga } from "./sagas/categoriesSaga";
+import { spawn } from 'redux-saga/effects'
+import  categoriesWatcher  from "./sagas/categoriesSaga";
+import authWatcher from "./sagas/authSaga";
 
-export default function* MySagas() {
-  yield all([...categoriesSaga]);
+export default function* rootSaga() {
+  yield spawn(categoriesWatcher)
+  yield spawn(authWatcher)
+ 
 }

@@ -1,12 +1,16 @@
 import React from "react";
 import { FiTrash2 } from "react-icons/fi";
-import { FaImage } from "react-icons/fa";
+import { FaImage, FaUsers } from "react-icons/fa";
+import { IoNotificationsOutline } from "react-icons/io5";
+import { MdOutlineMarkChatUnread, MdOutlineMarkChatRead } from "react-icons/md";
+import { GoDotFill } from "react-icons/go";
 import {
   BiDollarCircle,
   BiEditAlt,
   BiHomeAlt2,
   BiInfoCircle,
   BiLogOutCircle,
+  BiNotification,
   BiSearch,
   BiTrash,
 } from "react-icons/bi";
@@ -80,5 +84,10 @@ export const reactIcons = {
   cart:<BsCartCheck/>,
   emptyCart:<BsCartX/>,
   inventory: <MdOutlineInventory/>,
-  gallery: <FaImage/>
+  gallery: <FaImage/>,
+  users: <FaUsers/>,
+  notification: <IoNotificationsOutline />,
+  read: <MdOutlineMarkChatRead />,
+  unread: <MdOutlineMarkChatUnread />,
+  dotFill: <GoDotFill/>
 };

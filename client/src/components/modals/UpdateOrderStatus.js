@@ -1,12 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { Fragment } from "react";
-import { addCategory, updateCategory, updateOrderStatus } from "../../api/api";
+import { addCategory, socketConnect, updateCategory, updateOrderStatus } from "../../api/api";
 import { toast } from "react-toastify";
 import ToastMsg from "../toast/ToastMsg";
 import { colorsOptions } from "../../utils/constants";
 import ReactSelect from "../forms/ReactSelect";
+import TextInput from "../forms/TextInput";
 const statusArray=[
+  {
+  value: '',
+  label: 'Choose status'
+},
   {
   value: 'Pending',
   label: 'Pending'
@@ -25,7 +30,9 @@ const statusArray=[
 ]
 
 const UpdateOrderStatus = ({ isOpen, closeModal, formData, fetchData }) => {
-  const [status, setStatus] = useState({ label: formData?.status, value: formData?.status })
+  const socket = socketConnect('notifications');
+  const [status, setStatus] = useState(statusArray[0])
+  const [message, setMessage] = useState('')
 
   const handleReset = () => {
     closeModal();
@@ -37,12 +44,27 @@ const UpdateOrderStatus = ({ isOpen, closeModal, formData, fetchData }) => {
   }, [formData])
   const handleSubmit = async (value) => {
     try {
-      const res = await updateOrderStatus({ status: value, id: formData.id});
-      const { status, data } = res;
-      if (status >= 200 && status < 300) {
+      if(!status?.value){
+        toast.error(<ToastMsg title={"Please select a status"} />);
+        return;
+      }
+      if (!message && !message?.trim()){
+        toast.error(<ToastMsg title={"Please enter message"} />);
+        return;
+      }
+      const res = await updateOrderStatus({ status: status?.value, id: formData.id});
+      const { status:resStatus, data } = res;
+      if (resStatus >= 200 && resStatus < 300) {
         toast.success(<ToastMsg title={`Updated Successfully`} />);
         handleReset();
         fetchData()
+      
+        if (socket) {
+          socket.emit('send-notification', { userId: formData?.userId, message :message});
+
+        } else {
+          toast.error(<ToastMsg title="Unable to connect to the server. Please try again later." />);
+        }
       } else {
         toast.error(<ToastMsg title={data.message} />);
       }
@@ -98,13 +120,29 @@ const UpdateOrderStatus = ({ isOpen, closeModal, formData, fetchData }) => {
                           value={status || statusArray[0]}
                           onChange={(e) => {
                             setStatus(e);
-                            handleSubmit(e.value)
                           }}
+                        />
+                      </div>
+                      <div className="flex flex-col gap-1">
+                        <TextInput
+                          name="message"
+                          label={"Message"}
+                          placeholder="Enter message about order status"
+                          value={message}
+                          onChange={(e)=>setMessage(e.target.value)}
                         />
                       </div>
                       
                     </div>
                   </div>
+                </div>
+                <div className="mt-4 flex justify-end gap-6 items-center">
+                  <button type="button" onClick={handleSubmit} className="btn-primary">
+                  Submit
+                  </button>
+                  <button type="button" onClick={closeModal} className="btn-red">
+                    Cancel
+                  </button>
                 </div>
 
                 

@@ -90,7 +90,7 @@ const Orders = () => {
                         {order?.status!=='Cancelled' &&  <DeleteButton
                           onClick={() => {
                             setIsConfirmedOpen(true);
-                            setFormData({id:order?._id,status:order.status})
+                            setFormData({ id: order?._id, status: order.status, userId: order?.userDetails ?._id})
                           }}
 
                         >

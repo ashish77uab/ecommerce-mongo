@@ -2,6 +2,7 @@ import express from "express";
 import bodyParser from "body-parser";
 import mongoose from "mongoose";
 import cors from "cors";
+import voucherRoutes from "./routes/voucher.js";
 import userRoutes from "./routes/users.js";
 import categoryRoutes from "./routes/categories.js";
 import subCategoryRoutes from "./routes/subCategories.js";
@@ -15,6 +16,10 @@ import morgan from "morgan";
 import http from "http";
 import { Server } from "socket.io";
 import { updateProductCount } from "./controllers/products.js";
+import Voucher from "./models/Voucher.js";
+import { VoucherConstant } from "./utils/constant.js";
+import moment from 'moment'
+import Notification from "./models/Notification.js";
 
 dotenv.config();
 const app = express();
@@ -43,6 +48,7 @@ app.use("/products", productRoutes);
 app.use("/banners", bannerRoutes);
 app.use("/orders", orderRoutes);
 app.use("/wishlist", wishListRoutes);
+app.use("/voucher", voucherRoutes);
 app.post("/upload", upload.single("file"), (req, res) => {
   res.status(200).json(req.file.filename);
 });
@@ -88,22 +94,69 @@ productNamespace.on('connection', (socket) => {
     }
   });
 
-  socket.on('disconnect', () => {
+  socket.on('disconnect', (socket) => {
     console.log('A user disconnected');
   });
 });
 
-// const orderNamespace = io.of("/orders");
+const notificationNamespaces = io.of("/notifications");
 
-// orderNamespace.on("connection", (socket) => {
-//   console.log("Connected to orders namespace", socket.id);
+notificationNamespaces.on("connection", (socket) => {
 
-//   socket.on("orderEvent", (data) => {
-//     console.log("Order event received:", data);
-//     // Handle order-related socket events here
-//   });
+  socket.on("connect-notification",async ({userId}) => {
+    socket.join(userId);
+  });
+  socket.on("send-notification-admin", async ({ userId, voucherId }) => {
+    try {
+      const updatedVoucher = await Voucher.findByIdAndUpdate(
+        voucherId,
+        { $addToSet: { user: userId } }, // Add userId to the array only if it's not already there
+        { new: true } // Return the updated document
+      );
+      if (!updatedVoucher) {
+        console.log("Something went wrong while updating voucher");
+        return;
+      }
+      const message = `You have got one voucher with a code ${updatedVoucher?.code} valid upto ${moment(updatedVoucher?.expirationDate)?.format('MMM dd, YYYY hh:mm a')}`;
+      const createdNotification = await Notification.create({
+        user: userId,
+        type: VoucherConstant?.Voucher,
+        message: message
+      }
+      );
+      if (!createdNotification) {
+        console.log("Something went wrong while creating notification");
+        return;
+      }
+    
+      notificationNamespaces.to(userId).emit('notify-user', createdNotification);
 
-//   socket.on("disconnect", () => {
-//     console.log("A user disconnected from the orders namespace");
-//   });
-// });
+    } catch (error) {
+      throw new Error(error.message)
+    }
+  });
+  socket.on("send-notification", async ({ userId, message }) => {
+    try {
+
+      const createdNotification = await Notification.create({
+        user: userId,
+        type: VoucherConstant?.Order,
+        message: message
+      }
+      );
+      if (!createdNotification) {
+        console.log("Something went wrong while creating notification in send notification");
+        return;
+      }
+    
+      notificationNamespaces.to(userId).emit('notify-user', createdNotification);
+
+    } catch (error) {
+      throw new Error(error.message)
+    }
+  });
+
+  socket.on("disconnect", () => {
+    console.log("A user disconnected from the notifications namespace");
+  });
+});

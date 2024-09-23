@@ -32,7 +32,10 @@ export const createOrder = async (req, res) => {
       { $set: { levelValue: totalNumReviews } },
       { new: true }
     )
-    const totalPrice = totalPrices.reduce((a, b) => a + b, 0);
+    let totalPrice = totalPrices.reduce((a, b) => a + b, 0);
+    if (req.body?.discountValue){
+      totalPrice = totalPrice - req.body?.discountValue
+    }
 
     let order = new Order({
       productsList: orderItemsIds,

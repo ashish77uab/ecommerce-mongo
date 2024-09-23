@@ -7,6 +7,7 @@ import crypto from "crypto";
 import { sendEmail } from "../SendEmail.js";
 import mongoose from "mongoose";
 import { deleteFileFromCloudinary, uploadImageToCloudinary } from "../helpers/functions.js";
+import Notification from "../models/Notification.js";
 
 export const signin = async (req, res) => {
 
@@ -54,7 +55,7 @@ export const signin = async (req, res) => {
       return res.status(400).json({ message: "Invalid Password" });
 
     const token = jwt.sign(
-      { email: oldUser.email, id: oldUser._id,role: oldUser.role},
+      { email: oldUser.email, id: oldUser._id, role: oldUser.role },
       process.env.JWTSECRET,
       {
         expiresIn: "1d",
@@ -63,11 +64,11 @@ export const signin = async (req, res) => {
 
     res.status(200).json({ result: oldUser, token });
   } catch (error) {
-    return res.status(500).json({message: 'Internal server error'});
+    return res.status(500).json({ message: 'Internal server error' });
   }
 };
 export const uploadProfileImage = async (req, res) => {
- 
+
 
   try {
     const { type, image } = req.body;
@@ -79,19 +80,19 @@ export const uploadProfileImage = async (req, res) => {
     } else {
       oldFile = OldUser.profileImage;
     }
-    if(oldFile){
+    if (oldFile) {
       const isDeleted = await deleteFileFromCloudinary(oldFile)
       if (isDeleted) {
         const fileFromCloudinary = await uploadImageToCloudinary(req.file, res)
         tempImage = fileFromCloudinary?.url;
-      }else{
+      } else {
         res.status(500).json({ message: "Something went wrong while deleting previous image" });
       }
-    }else{
+    } else {
       const fileFromCloudinary = await uploadImageToCloudinary(req.file, res)
       tempImage = fileFromCloudinary?.url;
     }
-   
+
     if (type === "cover") {
       imageToSet = { coverImage: tempImage };
     } else {
@@ -105,12 +106,12 @@ export const uploadProfileImage = async (req, res) => {
 
     res.status(200).json(newUser);
   } catch (error) {
-    return res.status(500).json({message: 'Internal server error'});
+    return res.status(500).json({ message: 'Internal server error' });
   }
 };
 
 export const signup = async (req, res) => {
- 
+
   try {
     const data = { ...req.body };
     let fullName = `${data.firstName} ${data.lastName}`;
@@ -139,12 +140,12 @@ export const signup = async (req, res) => {
     );
     res.status(201).json({ result, token });
   } catch (error) {
-    return res.status(500).json({message: 'Internal server error'});
+    return res.status(500).json({ message: 'Internal server error' });
   }
 };
 
 export const googleSignIn = async (req, res) => {
- 
+
 
   try {
     const { email, name, token, googleId } = req.body;
@@ -162,7 +163,7 @@ export const googleSignIn = async (req, res) => {
 
     res.status(200).json({ result, token });
   } catch (error) {
-    return res.status(500).json({message: 'Internal server error'});
+    return res.status(500).json({ message: 'Internal server error' });
   }
 };
 export const getUser = async (req, res) => {
@@ -200,6 +201,14 @@ export const getUser = async (req, res) => {
         },
       },
       {
+        $lookup: {
+          from: "vouchers", // Name of the Voucher collection
+          localField: "_id",
+          foreignField: "user",
+          as: "vouchers",
+        },
+      },
+      {
         $project: {
           password: 0, // Exclude the password field
         },
@@ -208,7 +217,7 @@ export const getUser = async (req, res) => {
 
     res.status(200).json(userData[0] || {}); // Send the first (and likely only) result back
   } catch (error) {
-    return res.status(500).json({message: 'Internal server error'});
+    return res.status(500).json({ message: 'Internal server error' });
 
   }
 };
@@ -220,48 +229,162 @@ export const getUser = async (req, res) => {
 //   res.status(200).json(userData);
 // };
 export const getUsers = async (req, res) => {
- try {
-   const users = await User.find({});
-   res.status(200).json(users);
- } catch (error) {
-   return res.status(500).json({message: 'Internal server error'});
- }
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+    const totalUsers = await User.countDocuments();
+    const allUsers = await User.aggregate([
+      // Match users with role "User"
+      {
+        $match: {
+          role: "User",
+        },
+      },
+      // Lookup carts from OrderItem collection
+      {
+        $lookup: {
+          from: "orderitems", // Name of the OrderItem collection
+          let: { userId: "$_id" },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    { $eq: ["$user", "$$userId"] },  // Match user's order items
+                    { $eq: ["$isPlaced", false] }   // Filter for isPlaced: false
+                  ]
+                }
+              }
+            }
+          ],
+          as: "carts",
+        },
+      },
+      // Lookup wishlist items from WishListItem collection
+      {
+        $lookup: {
+          from: "wishlistitems", // Name of the WishListItem collection
+          localField: "_id",
+          foreignField: "user",
+          as: "wishlistItems",
+        },
+      },
+      {
+        $lookup: {
+          from: "vouchers", // Name of the Voucher collection
+          localField: "_id",
+          foreignField: "user",
+          as: "vouchers",
+        },
+      },
+      {
+        $sort: { createdAt: -1 }, // Sort the results by createdAt (most recent orders first)
+      },
+      {
+        $skip: skip, // Skip the necessary number of documents for pagination
+      },
+      {
+        $limit: limit, // Limit the results to the page size
+      }
+
+    ]);
+    res.status(200).json({
+      users: allUsers,
+      currentPage: page,
+      totalPages: Math.ceil(totalUsers / limit),
+      totalUsers
+    });
+  } catch (error) {
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+};
+export const getNotifications = async (req, res) => {
+  try {
+    const userId = req?.user?.id
+    const skip = parseInt(req?.query?.skip) || 0;
+    const take = parseInt(req?.query?.take) || 10;
+    const totalNotifications = await Notification.countDocuments({
+      user: mongoose.Types.ObjectId(userId)
+    });
+    const allNotifications = await Notification.aggregate([
+      {
+        $match: { user: mongoose.Types.ObjectId(userId) }, // Match orders for the user
+      },
+      {
+        $sort: { createdAt: -1 }, 
+      },
+      {
+        $skip: skip,
+      },
+      {
+        $limit: take, 
+      }
+
+    ]);
+    res.status(200).json({
+      notifications: allNotifications,
+      totalNotifications
+    });
+  } catch (error) {
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+};
+export const deleteNotifications = async (req, res) => {
+  try {
+    const notificationId = req?.params?.id
+    const deletedNotification = await Notification.findByIdAndDelete(notificationId);
+    res.status(200).json(deletedNotification);
+  } catch (error) {
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+};
+export const readNotifications = async (req, res) => {
+  try {
+    const notificationId = req?.params?.id
+    const updatedNotification = await Notification.findByIdAndUpdate(notificationId,{$set:{
+      isRead:true,
+    }});
+    res.status(200).json(updatedNotification);
+  } catch (error) {
+    return res.status(500).json({ message: 'Internal server error' });
+  }
 };
 
 export const resetPasswordRequestController = async (req, res) => {
- try {
-   const user = await User.findOne({ email: req.body.email });
-   if (!user) res.status(404).json({ message: "Email does not exist" });
+  try {
+    const user = await User.findOne({ email: req.body.email });
+    if (!user) res.status(404).json({ message: "Email does not exist" });
 
-   let token = await Token.findOne({ userId: user._id });
-   if (token) {
-     await token.deleteOne();
-   }
+    let token = await Token.findOne({ userId: user._id });
+    if (token) {
+      await token.deleteOne();
+    }
 
-   let resetToken = crypto.randomBytes(32).toString("hex");
-   const hash = await bcrypt.hash(resetToken, Number(process.env.BCRYPT_SALT));
+    let resetToken = crypto.randomBytes(32).toString("hex");
+    const hash = await bcrypt.hash(resetToken, Number(process.env.BCRYPT_SALT));
 
-   await new Token({
-     userId: user._id,
-     token: hash,
-     createdAt: Date.now(),
-   }).save();
+    await new Token({
+      userId: user._id,
+      token: hash,
+      createdAt: Date.now(),
+    }).save();
 
-   const link = `${process.env.CLIENT_URL}/passwordReset?token=${resetToken}&id=${user._id}`;
+    const link = `${process.env.CLIENT_URL}/passwordReset?token=${resetToken}&id=${user._id}`;
 
-   sendEmail(
-     user.email,
-     "Password Reset Request",
-     {
-       name: user.fullName,
-       link: link,
-     },
-     "/views/template/requestResetPassword.ejs"
-   );
-   return res.json({ link });
- } catch (error) {
-   return res.status(500).json({message: 'Internal server error'});
- }
+    sendEmail(
+      user.email,
+      "Password Reset Request",
+      {
+        name: user.fullName,
+        link: link,
+      },
+      "/views/template/requestResetPassword.ejs"
+    );
+    return res.json({ link });
+  } catch (error) {
+    return res.status(500).json({ message: 'Internal server error' });
+  }
 };
 
 export const resetPasswordController = async (req, res) => {
@@ -307,6 +430,6 @@ export const resetPasswordController = async (req, res) => {
 
     return res.json({ message: "Password reset was successful" });
   } catch (error) {
-    return res.status(500).json({message: 'Internal server error'});
+    return res.status(500).json({ message: 'Internal server error' });
   }
 };

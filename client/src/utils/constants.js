@@ -7,6 +7,11 @@ export const links = [
     icon: reactIcons.home,
   },
   {
+    path: "users",
+    title: "Users",
+    icon: reactIcons.users,
+  },
+  {
     path: "categories",
     title: "Categories",
     icon: reactIcons.list,
@@ -25,6 +30,11 @@ export const links = [
     path: "banners",
     title: "Banners",
     icon: reactIcons.gallery,
+  },
+  {
+    path: "vouchers",
+    title: "Vouchers",
+    icon: reactIcons.list
   },
 ];
 export const colorsOptions=[
@@ -60,5 +70,7 @@ export const bannerTypes=[
 export const getUserToken=()=>{
   return localStorage.getItem("ashishToken")
 }
-
+export const getIsNewNotification = () => {
+  return localStorage.getItem('isNewNotification')
+}
 

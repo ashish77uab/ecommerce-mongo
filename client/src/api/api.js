@@ -89,3 +89,16 @@ export const getUser = () => API.get("auth/profile");
 export const uploadProfileImage = (id, formData) =>
   API.post(`auth/profileImage/${id}`, formData);
 export const uploadImage = (formData) => API.post("upload", formData);
+
+export const getAllUsersList = (data) => API.get(`auth/all-users?page=${data?.page}&limit=${data?.limit}`);
+export const getAllUserNotifications = (data) => API.get(`auth/notifications?skip=${data?.skip}&take=${data?.take}`);
+export const deleteNotification = (notificationId) => API.delete(`auth/notifications/delete/${notificationId}`);
+export const readNotification = (notificationId) => API.put(`auth/notifications/read/${notificationId}`);
+
+// Vouchers
+export const getAllVouchers = (data) => API.get(`voucher?page=${data?.page}&limit=${data?.limit}`);
+export const createVoucher = (data) => API.post(`voucher/create`,data);
+export const updateVoucher = (voucherId, data) => API.put(`voucher/update/${voucherId}`, data);
+export const getVoucher = (voucherId) => API.get(`voucher/single/${voucherId}`);
+export const deleteVoucher = (voucherId) => API.delete(`voucher/delete/${voucherId}`);
+export const checkVoucherCode = (data) => API.post(`voucher/check`, data);

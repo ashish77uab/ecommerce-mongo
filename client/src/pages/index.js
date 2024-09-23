@@ -20,6 +20,9 @@ import AllCategories from "./AllCategories";
 import UserLevel from "./UserLevel";
 import Banners from "./dashboard/Banners";
 import AddBanners from "./dashboard/AddBanners";
+import AllUsers from "./dashboard/AllUsers";
+import Vouchers from "./dashboard/Vouchers";
+import CreateAndUpdateVoucher from "./dashboard/CreateAndUpdateVoucher";
 
 export {
   Login,
@@ -43,5 +46,8 @@ export {
   AllCategories,
   Banners,
   AddBanners,
-  UserLevel
+  UserLevel,
+  AllUsers,
+  Vouchers,
+  CreateAndUpdateVoucher
 };

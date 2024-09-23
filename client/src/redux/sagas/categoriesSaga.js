@@ -10,7 +10,6 @@ function* fetchCategories() {
     yield put({ type: "USER_FETCH_FAILED", message: e.message });
   }
 }
-export function* watchCategoriesAsync() {
+export default function* categoriesWatcher() {
   yield takeLatest(setSagaCategories.type, fetchCategories);
 }
-export const categoriesSaga = [fork(fetchCategories)];

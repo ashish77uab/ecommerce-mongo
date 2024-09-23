@@ -1,15 +1,31 @@
 import { createSlice } from "@reduxjs/toolkit";
-
+import { getIsNewNotification } from "../../utils/constants";
+const isNewNotification = getIsNewNotification('isNewNotification')
+  ? JSON.parse(getIsNewNotification('isNewNotification'))
+  : false
 const authSlice = createSlice({
   name: "auth",
   initialState: {
     user: null,
     error: "",
     loading: false,
+    notifications: {
+      notifications:[],
+      totalNotifications: 0,
+    },
+    notificationsLoading: false,
+    isNewNotification: isNewNotification
   },
   reducers: {
+   
     setUser: (state, action) => {
       state.user = action.payload;
+    },
+    toggleNewNotification: (state, action) => {
+      state.isNewNotification = action.payload;
+    },
+    updateNotification: (state, action) => {
+      state.notifications = { ...state?.notifications, notifications: [action.payload,...state?.notifications?.notifications], totalNotifications: state?.notifications?.totalNotifications+1 };
     },
     updateUserCarts: (state, action) => {
       state.user.carts = [...state.user.carts, action.payload];
@@ -30,6 +46,30 @@ const authSlice = createSlice({
       localStorage.removeItem("ashishToken");
       state.user = null;
     },
+    deleteNotificationStart: (state, action) => {
+      state.notificationsLoading = true;
+    },
+    deleteNotificationComplete: (state, action) => {
+      state.notifications = action.payload;
+      state.notificationsLoading = false;
+    },
+    readNotificationStart: (state, action) => {
+      state.notificationsLoading = true;
+    },
+    readNotificationComplete: (state, action) => {
+      state.notifications = action.payload;
+      state.notificationsLoading = false;
+    },
+    getUserNotifcationStart: (state, action) => {
+      state.notificationsLoading = true;
+    },
+    getUserNotifcationSuccess: (state, action) => {
+      state.notifications = action.payload;
+      state.notificationsLoading = false;
+    },
+    getUserNotifcationFailure: (state, action) => {
+      state.notificationsLoading = false;
+    },
   },
   extraReducers: {},
 });
@@ -42,6 +82,15 @@ export const {
   updateWholeCarts,
   setUserWishList,
   updateWishList,
+  getUserNotifcationStart,
+  getUserNotifcationSuccess,
+  getUserNotifcationFailure,
+  deleteNotificationStart,
+  deleteNotificationComplete,
+  readNotificationComplete,
+  readNotificationStart,
+  updateNotification,
+  toggleNewNotification
 } = authSlice.actions;
 
 export default authSlice.reducer;

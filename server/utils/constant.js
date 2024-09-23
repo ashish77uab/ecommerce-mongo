@@ -11,6 +11,13 @@ export const LEVEL_STATUS = {
     7: 1500,
     8: 2000,
     9: 2500,
-    10:5000,
-    
+    10: 5000,
+
+}
+
+export const VoucherConstant = {
+    Order: "Order",
+    Promotion: "Promotion",
+    System: "System",
+    Voucher: "Voucher",
 }

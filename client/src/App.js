@@ -24,6 +24,9 @@ import {
   AllCategories,
   Banners,
   AddBanners,
+  AllUsers,
+  Vouchers,
+  CreateAndUpdateVoucher
 } from "./pages";
 import { getUser } from "./api/api";
 import { useDispatch } from "react-redux";
@@ -72,6 +75,10 @@ function App() {
           <Route path="/dashboard" element={<DashboardLayout />}>
             <Route index element={<Dashboard />} />
             <Route path="categories" element={<Category />} />
+            <Route path="create/vouchers" element={<CreateAndUpdateVoucher />} />
+            <Route path="/dashboard/update/vouchers/:voucherId" element={<CreateAndUpdateVoucher />} />
+            <Route path="vouchers" element={<Vouchers />} />
+            <Route path="users" element={<AllUsers />} />
             <Route path="categories/:id" element={<SubCategory />} />
             <Route path="products" element={<Product />} />
             <Route path="orders" element={<Orders />} />

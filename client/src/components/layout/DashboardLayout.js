@@ -9,10 +9,12 @@ const DashboardLayout = () => {
   const user = useSelector((state) => state.auth.user);
   const navigate=useNavigate()
  useEffect(()=>{
-   if(user?.role!=='Admin'){
-    navigate(-1)
+   if (user?.role){
+     if(user?.role!=='Admin'){
+      navigate('/')
+     }
    }
- },[user])
+ }, [user?.role])
 
   return (
     <div className="flex h-screen w-full flex-col overflow-hidden">

@@ -1,20 +1,46 @@
 import { Menu, Transition } from "@headlessui/react";
-import { Fragment } from "react";
+import { Fragment, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { reactIcons } from "../../utils/icons";
-import { setLogout } from "../../redux/features/authSlice";
+import { getUserNotifcationStart, setLogout, toggleNewNotification, updateNotification } from "../../redux/features/authSlice";
 import { Link, useNavigate } from "react-router-dom";
+import { getUserToken } from "../../utils/constants";
+import { socketConnect } from "../../api/api";
+import NotificationPopper from "../popper/NotificationPopper";
 
 const Navbar = () => {
+  
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const user = useSelector((state) => state.auth.user);
+  const {  user } = useSelector((state) => state.auth);
   const cartLength = user?.carts?.length;
   const wishlistLength = user?.whislistItems?.length;
   const handleLogout = () => {
     dispatch(setLogout());
     navigate("/login");
   };
+  const isLoggedIn = getUserToken()
+  const handleUpdateNotificationCount = () => {
+    const prevCount = Number(localStorage?.getItem('notificationCount')) || 0
+    const nextCount = prevCount + 1
+    localStorage?.setItem('isNewNotification', JSON.stringify(true))
+    localStorage?.setItem('notificationCount', JSON.stringify(nextCount))
+    dispatch(toggleNewNotification(true))
+  }
+  useEffect(() => {
+    const socket = socketConnect('notifications');
+    if (isLoggedIn && user?._id) {
+      socket.emit('connect-notification', { userId: user?._id });
+      socket.on('notify-user', (data) => {
+        handleUpdateNotificationCount()
+        dispatch(updateNotification(data))
+      });
+    }
+    return () => {
+      socket.disconnect();
+    };
+  }, [isLoggedIn, user]);
+
   return (
     <nav className="flex items-center  shadow-navbar  py-3 sticky top-0 w-full bg-white z-[50]">
       <div className="container">
@@ -51,6 +77,7 @@ const Navbar = () => {
 
                   {reactIcons.heartFill}
                 </Link>
+                <NotificationPopper  dispatch={dispatch} />
                 <Menu as="div" className="relative">
                   <Menu.Button
                     className={
@@ -85,25 +112,23 @@ const Navbar = () => {
                           {({ active }) => (
                             <button
                               onClick={() => navigate(`/profile/${user._id}`)}
-                              className={`${
-                                active
+                              className={`${active
                                   ? "bg-violet-500 text-white"
                                   : "text-gray-900"
-                              } group flex w-full items-center rounded-md px-2 py-2 text-base`}
+                                } group flex w-full items-center rounded-md px-2 py-2 text-base`}
                             >
                               Profile
                             </button>
                           )}
                         </Menu.Item>
-                      {user?.role==='Admin' &&   <Menu.Item>
+                        {user?.role === 'Admin' && <Menu.Item>
                           {({ active }) => (
                             <button
                               onClick={() => navigate(`/dashboard`)}
-                              className={`${
-                                active
+                              className={`${active
                                   ? "bg-violet-500 text-white"
                                   : "text-gray-900"
-                              } group flex w-full items-center rounded-md px-2 py-2 text-base`}
+                                } group flex w-full items-center rounded-md px-2 py-2 text-base`}
                             >
                               Go to dashboard
                             </button>
@@ -114,11 +139,10 @@ const Navbar = () => {
                           {({ active }) => (
                             <button
                               onClick={() => navigate(`/orders`)}
-                              className={`${
-                                active
+                              className={`${active
                                   ? "bg-violet-500 text-white"
                                   : "text-gray-900"
-                              } group flex w-full items-center rounded-md px-2 py-2 text-base`}
+                                } group flex w-full items-center rounded-md px-2 py-2 text-base`}
                             >
                               My orders
                             </button>
@@ -128,11 +152,10 @@ const Navbar = () => {
                           {({ active }) => (
                             <button
                               onClick={handleLogout}
-                              className={`${
-                                active
+                              className={`${active
                                   ? "bg-violet-500 text-white"
                                   : "text-gray-900"
-                              } group flex w-full items-center rounded-md px-2 py-2 text-base`}
+                                } group flex w-full items-center rounded-md px-2 py-2 text-base`}
                             >
                               Log out
                             </button>
