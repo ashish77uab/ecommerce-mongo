@@ -5,9 +5,9 @@ import { toast } from "react-toastify";
 import ToastMsg from "../components/toast/ToastMsg";
 import { reactIcons } from "../utils/icons";
 import Spinner from "../components/loaders/Spinner";
-import { uploadProfileImage } from "../api/api";
+import { getUser, uploadProfileImage } from "../api/api";
 import { CopyToClipboard } from 'react-copy-to-clipboard';
-import { updateUser } from "../redux/features/authSlice";
+import { setUser, updateUser } from "../redux/features/authSlice";
 import { imageRender } from "../utils/helpers";
 import moment from "moment";
 const LEVEL_POINTS=[
@@ -59,6 +59,22 @@ const Profile = () => {
             setIsLoading(false);
         }
     };
+    const getUserData = async () => {
+        try {
+            const res = await getUser();
+            const { status, data } = res;
+            if (status >= 200 && status < 300) {
+                dispatch(setUser(data));
+            } else {
+                toast.error(<ToastMsg title={"Something went wrong"} />);
+            }
+        } catch (error) {
+            console.log(error, "error");
+        }
+    };
+    useEffect(() => {
+            getUserData();
+    }, []);
     
 
    
@@ -196,7 +212,7 @@ const Profile = () => {
                                 </div>
                                 <div className="space-y-2">
                                     {
-                                        user?.vouchers.map((voucher, index) => {
+                                        user?.vouchers?.map((voucher, index) => {
                                             const isExpired = moment().isAfter(moment(voucher?.expirationDate));
                                             const isUsed = voucher?.usedVoucher;
                                             const showExpiredAndUsed = isUsed || isExpired

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { addToCart, addToWishList, getSingleProduct, socketConnect } from "../api/api";
 import ToastMsg from "../components/toast/ToastMsg";
@@ -12,6 +12,7 @@ import { setUserWishList, updateUserCarts } from "../redux/features/authSlice";
 import { getUserToken } from "../utils/constants";
 import Spinner from "../components/loaders/Spinner";
 const ProductDetail = () => {
+  const socketRef = useRef()
   const dispatch = useDispatch();
   const [active, setActive] = useState(0);
   const [quantity, setQuantity] = useState(1);
@@ -25,15 +26,17 @@ const ProductDetail = () => {
   const [viewerCount, setViewerCount] = useState(0);
 
   useEffect(() => {
-    const socket = socketConnect('products');
+    if(!socketRef.current){
+      socketRef.current = socketConnect('products');
+    }
     if (id && isLoggedIn && user?._id) {
-        socket.emit('viewProduct', { productId: id, userId: user?._id }); 
-        socket.on('viewerCount', (count) => {
+        socketRef.current?.emit('viewProduct', { productId: id, userId: user?._id }); 
+        socketRef.current?.on('viewerCount', (count) => {
           setViewerCount(count);
         });
         return () => {
-          socket.emit('leaveProduct', { productId: id, userId: user?._id });
-          socket.disconnect();
+          socketRef.current?.emit('leaveProduct', { productId: id, userId: user?._id });
+          socketRef.current?.disconnect();
         };
       }
   }, [id, isLoggedIn, user]);

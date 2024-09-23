@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { Fragment } from "react";
 import { toast } from "react-toastify";
@@ -9,7 +9,7 @@ import { socketConnect } from "../../api/api";
 
 
 const SendVoucherNotification = ({ isOpen, closeModal, formData, userId, loading }) => {
-  let socket;
+  const socketRef=useRef();
   const [selectedVoucher, setSelectedVoucher] = useState(null)
   const [voucherArray, setVoucherArray] = useState([])
 
@@ -25,11 +25,12 @@ const SendVoucherNotification = ({ isOpen, closeModal, formData, userId, loading
   }, [formData])
 
   const handleSubmit = () => {
-    socket = socketConnect('notifications');
-    if (socket) {
-      socket.emit('send-notification-admin', { userId: userId, voucherId: selectedVoucher?.value });
+    if (!socketRef.current){
+      socketRef.current = socketConnect('notifications')
+    }
+    if (socketRef.current) {
+      socketRef.current?.emit('send-notification-admin', { userId: userId, voucherId: selectedVoucher?.value });
       toast.success(<ToastMsg title="Sent Successfully" />);
-
       handleReset()
 
     }else{

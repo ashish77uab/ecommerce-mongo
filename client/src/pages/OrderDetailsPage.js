@@ -47,6 +47,11 @@ const WishlistDetail = () => {
     }
   };
   const handleReviewOrder = async (id) => {
+    if(!rating || !text){
+      toast.error(<ToastMsg title={'Please fill rating and message fields'} />);
+      return;
+
+    }
     setLoading(true)
     try {
       const res = isUpdate ? await editProductReview(reviewId, { product: id, rating: rating, text: text })  : await addProductReview({ product: id, rating: rating, text: text });
@@ -145,7 +150,7 @@ const handleCancelOrder = async (id) => {
                                 <span className="mr-2">Quantity:</span>
                                 <b>{product?.quantity}</b>
                               </div>
-                              {product?.productDetails?.hasReviewed && !isReviewOpen &&
+                              {product?.productDetails?.hasReviewed && 
                               <div>
                                   <div className="mb-0 flex items-center gap-2">
                                     <StarRating
@@ -154,8 +159,8 @@ const handleCancelOrder = async (id) => {
                                     />
                                     {product?.productDetails?.hasReviewed == true && order?.status === 'Delivered' &&
                                       <ActionButton onClick={() => {
-                                        setIsReviewOpen(prev => !prev)
-                                        setProductId(prev => prev === product.product ? null : product.product)
+                                        setIsReviewOpen(true)
+                                        setProductId(product.product)
                                         setRating(product?.productDetails?.userReview?.rating)
                                         setText(product?.productDetails?.userReview?.text)
                                         setIsUpdate(prev => !prev)
@@ -184,9 +189,14 @@ const handleCancelOrder = async (id) => {
                                 </div>
                               </div>}
                               <div className="flex gap-4 items-center">
-                                {order?.status === 'Delivered' && product?.productDetails?.hasReviewed == false && !isReviewOpen && <div onClick={(e) => {
-                                  setIsReviewOpen(prev => !prev)
+                                {order?.status === 'Delivered' && product?.productDetails?.hasReviewed == false && productId !== product?.product && <div onClick={(e) => {
+                                  setIsReviewOpen(true)
                                   setProductId(product.product)
+                                  // for update reset
+                                  setRating('')
+                                  setText('')
+                                  setIsUpdate(false)
+                                  setReviewId('')
                                   e.stopPropagation()
                                 }} className="btn-outline-primary btn-sm py-[6px] px-6 inline-flex my-2">
                                   Add Review
@@ -194,11 +204,13 @@ const handleCancelOrder = async (id) => {
                                 {productId === product?.product && (
                                   <>
                                     <div onClick={(e) => {
-                                      setIsReviewOpen(prev => !prev)
-                                      setProductId(prev => prev === product.product ? null : product.product)
+                                      setIsReviewOpen(false)
+                                      setProductId(null)
                                       e.stopPropagation()
                                       setRating('')
                                       setText('')
+                                      setIsUpdate(false)
+                                      setReviewId('')
                                     }} className="btn-outline-primary btn-sm py-[6px] px-6 inline-flex my-2">
                                       Cancel
                                     </div>

@@ -31,7 +31,9 @@ const Navbar = () => {
   useEffect(() => {
    
     if (isLoggedIn && user?._id) {
-      socketRef.current = socketConnect('notifications');
+      if (!socketRef.current){
+        socketRef.current = socketConnect('notifications');
+      }
       socketRef.current?.emit('connect-notification', { userId: user?._id });
       socketRef.current?.on('notify-user', (data) => {
         handleUpdateNotificationCount()

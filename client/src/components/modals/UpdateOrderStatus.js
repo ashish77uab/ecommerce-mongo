@@ -31,7 +31,10 @@ const statusArray=[
 
 const UpdateOrderStatus = ({ isOpen, closeModal, formData, fetchData }) => {
   const socketRef=useRef()
-   socketRef.current = socketConnect('notifications');
+  if(!socketRef.current){
+    socketRef.current = socketConnect('notifications');
+
+  }
   const [status, setStatus] = useState(statusArray[0])
   const [message, setMessage] = useState('')
 
