@@ -218,7 +218,7 @@ const handleCancelOrder = async (id) => {
                                       handleReviewOrder(product.product)
                                       e.stopPropagation()
                                     }} className="btn-green btn-sm py-[6px] px-6 inline-flex my-2">
-                                      {setIsUpdate? 'Update' : 'Submit'}
+                                      {isUpdate? 'Update' : 'Submit'}
                                     </div>
 
                                   </>
