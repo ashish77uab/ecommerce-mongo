@@ -97,7 +97,7 @@ const ChatUser = () => {
     }, [messages]);
     return (
         <ChatComponent
-            users={users}
+            users={users?.users}
             selectedUser={selectedUser}
             handleSubmit={handleSubmit}
             handleClickUser={handleClickUser}
