@@ -4,7 +4,6 @@ export const authenticateJWT = (req, res, next) => {
 
   if (authHeader) {
     const token = authHeader.split(" ")[1];
-
     jwt.verify(token, process.env.JWTSECRET, (err, user) => {
       if (err) {
         return res.sendStatus(403);
@@ -16,3 +15,14 @@ export const authenticateJWT = (req, res, next) => {
     res.status(401).json({ message: "Unauthorized" });
   }
 };
+
+export const isValidToken = (token) => {
+  return  jwt.verify(token, process.env.JWTSECRET, (err, user) => {
+    if (err) {
+      return false
+    }else{
+      return user
+
+    }
+  });
+}

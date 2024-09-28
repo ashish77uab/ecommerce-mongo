@@ -44,6 +44,8 @@ import {
   AiOutlineUnorderedList,
 } from "react-icons/ai";
 import { MdOutlineInventory } from "react-icons/md";
+import { IoChatbubbleEllipsesOutline } from "react-icons/io5";
+
 export const reactIcons = {
   plus: <BsPlusLg />,
   minus: <AiOutlineMinus />,
@@ -89,5 +91,6 @@ export const reactIcons = {
   notification: <IoNotificationsOutline />,
   read: <MdOutlineMarkChatRead />,
   unread: <MdOutlineMarkChatUnread />,
-  dotFill: <GoDotFill/>
+  dotFill: <GoDotFill/>,
+  chat: <IoChatbubbleEllipsesOutline/>
 };

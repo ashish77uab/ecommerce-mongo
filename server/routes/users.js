@@ -11,7 +11,8 @@ import {
   getUsers,
   getNotifications,
   deleteNotifications,
-  readNotifications
+  readNotifications,
+  getAllAdmin
 } from "../controllers/users.js";
 import { authenticateJWT } from "../middleware/auth.js";
 import upload from "../middleware/upload.js";
@@ -23,6 +24,7 @@ router.post("/resetPassword", resetPasswordController);
 router.post("/googleSignIn", googleSignIn);
 router.get("/profile", authenticateJWT, getUser);
 router.get("/all-users", authenticateJWT, getUsers);
+router.get("/all-admin", authenticateJWT, getAllAdmin);
 router.get("/notifications", authenticateJWT, getNotifications);
 router.delete("/notifications/delete/:id", authenticateJWT, deleteNotifications);
 router.put("/notifications/read/:id", authenticateJWT, readNotifications);

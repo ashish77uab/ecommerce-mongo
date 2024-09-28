@@ -260,6 +260,7 @@ export const getUser = async (req, res) => {
 // };
 export const getUsers = async (req, res) => {
   try {
+    const userId=req?.user?.id
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
@@ -309,6 +310,55 @@ export const getUsers = async (req, res) => {
         },
       },
       {
+        $lookup: {
+          from: "messages", // Name of the Message collection
+          let: { userId: "$_id" }, // Variable to use in pipeline
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    { $eq: ["$sender", "$$userId"] },
+                    { $eq: ["$recipient", mongoose.Types.ObjectId(userId) ] }, // Match recipient to the user
+                    { $eq: ["$read", false] }, // Only include unread messages
+                  ],
+                },
+              },
+            },
+            {
+              $sort: { createdAt: -1 }, // Sort the results by createdAt (most recent messages first)
+            },
+          ],
+          as: "unreadMessages",
+        },
+      },
+      {
+        $lookup: {
+          from: "messages",
+          let: { userId: "$_id" },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    { $eq: ["$sender", "$$userId"] },
+                    { $eq: ["$recipient", mongoose.Types.ObjectId(userId)] }, // Match recipient to the user
+                    { $eq: ["$read", true] }, // Only read messages
+                  ],
+                },
+              },
+            },
+            {
+              $sort: { createdAt: -1 }, // Most recent read message
+            },
+            {
+              $limit: 1, // Get only the latest read message
+            },
+          ],
+          as: "latestReadMessage",
+        },
+      },
+      {
         $sort: { createdAt: -1 }, // Sort the results by createdAt (most recent orders first)
       },
       {
@@ -325,6 +375,75 @@ export const getUsers = async (req, res) => {
       totalPages: Math.ceil(totalUsers / limit),
       totalUsers
     });
+  } catch (error) {
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+};
+export const getAllAdmin = async (req, res) => {
+  try {
+   const userId=req?.user?.id
+    const allAdmin = await User.aggregate([
+      {
+        $match: {
+          role: "Admin",
+        },
+      },
+      {
+        $lookup: {
+          from: "messages", // Name of the Message collection
+          let: { userId: "$_id" }, // Variable to use in pipeline
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    { $eq: ["$sender", "$$userId"] },
+                    { $eq: ["$recipient", mongoose.Types.ObjectId(userId)] }, // Match recipient to the user
+                    { $eq: ["$read", false] }, // Only include unread messages
+                  ],
+                },
+              },
+            },
+            {
+              $sort: { createdAt: -1 }, // Sort the results by createdAt (most recent messages first)
+            },
+          ],
+          as: "unreadMessages",
+        },
+      },
+      {
+        $lookup: {
+          from: "messages",
+          let: { userId: "$_id" },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    { $eq: ["$sender", "$$userId"] },
+                    { $eq: ["$recipient", mongoose.Types.ObjectId(userId)] }, // Match recipient to the user
+                    { $eq: ["$read", true] }, // Only read messages
+                  ],
+                },
+              },
+            },
+            {
+              $sort: { createdAt: -1 }, // Most recent read message
+            },
+            {
+              $limit: 1, // Get only the latest read message
+            },
+          ],
+          as: "latestReadMessage",
+        },
+      },
+      {
+        $sort: { createdAt: -1 }, // Sort the results by createdAt (most recent orders first)
+      },
+     
+
+    ]);
+    res.status(200).json(allAdmin);
   } catch (error) {
     return res.status(500).json({ message: 'Internal server error' });
   }

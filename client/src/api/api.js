@@ -4,8 +4,13 @@ const devEnv = process.env.NODE_ENV !== "production";
 
 const { REACT_APP_DEV_API, REACT_APP_PROD_API } = process.env;
 const baseURL = `${devEnv ? REACT_APP_DEV_API : REACT_APP_PROD_API}`
-export const socketConnect = (namespace) => {
-  return io(`${baseURL}${namespace}`)
+export const socketConnect = (namespace,token) => {
+  return io(`${baseURL}${namespace}`,{
+    auth: {
+      token, 
+    },
+    transports: ['websocket']
+  });
 }
 const API = axios.create({
   baseURL: baseURL ,
@@ -93,6 +98,7 @@ export const uploadProfileImage = (id, formData) =>
 export const uploadImage = (formData) => API.post("upload", formData);
 
 export const getAllUsersList = (data) => API.get(`auth/all-users?page=${data?.page}&limit=${data?.limit}`);
+export const getAllAdminList = () => API.get(`auth/all-admin`);
 export const getAllUserNotifications = (data) => API.get(`auth/notifications?skip=${data?.skip}&take=${data?.take}`);
 export const deleteNotification = (notificationId) => API.delete(`auth/notifications/delete/${notificationId}`);
 export const readNotification = (notificationId) => API.put(`auth/notifications/read/${notificationId}`);
@@ -104,3 +110,5 @@ export const updateVoucher = (voucherId, data) => API.put(`voucher/update/${vouc
 export const getVoucher = (voucherId) => API.get(`voucher/single/${voucherId}`);
 export const deleteVoucher = (voucherId) => API.delete(`voucher/delete/${voucherId}`);
 export const checkVoucherCode = (data) => API.post(`voucher/check`, data);
+
+export const getAllUserMessagesList = (userId, adminId) => API.get(`messages/user/${userId}/${adminId}`);

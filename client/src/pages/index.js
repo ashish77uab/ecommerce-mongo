@@ -23,6 +23,8 @@ import AddBanners from "./dashboard/AddBanners";
 import AllUsers from "./dashboard/AllUsers";
 import Vouchers from "./dashboard/Vouchers";
 import CreateAndUpdateVoucher from "./dashboard/CreateAndUpdateVoucher";
+import ChatUser from "./dashboard/ChatUser";
+import ChatAdmin from "./ChatAdmin";
 
 export {
   Login,
@@ -49,5 +51,7 @@ export {
   UserLevel,
   AllUsers,
   Vouchers,
-  CreateAndUpdateVoucher
+  CreateAndUpdateVoucher,
+  ChatUser,
+  ChatAdmin
 };

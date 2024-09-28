@@ -36,6 +36,11 @@ export const links = [
     title: "Vouchers",
     icon: reactIcons.list
   },
+  {
+    path: "chat-user",
+    title: "Chat User",
+    icon: reactIcons.chat
+  },
 ];
 export const colorsOptions=[
     '#c4b5fd',

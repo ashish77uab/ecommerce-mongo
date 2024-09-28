@@ -26,7 +26,9 @@ import {
   AddBanners,
   AllUsers,
   Vouchers,
-  CreateAndUpdateVoucher
+  CreateAndUpdateVoucher,
+  ChatUser,
+  ChatAdmin
 } from "./pages";
 import { getUser } from "./api/api";
 import { useDispatch } from "react-redux";
@@ -71,10 +73,12 @@ function App() {
             <Route path="/categories" element={<AllCategories />} />
             <Route path="/orders" element={<ProtectedRoutes> <OrderDetailsPage /></ProtectedRoutes>} />
             <Route path="/profile/:userId" element={<ProtectedRoutes> <Profile /></ProtectedRoutes>} />
+            <Route path="/chat-admin" element={<ProtectedRoutes> <ChatAdmin /></ProtectedRoutes>} />
           </Route>
           <Route path="/dashboard" element={<DashboardLayout />}>
             <Route index element={<Dashboard />} />
             <Route path="categories" element={<Category />} />
+            <Route path="chat-user" element={<ChatUser />} />
             <Route path="create/vouchers" element={<CreateAndUpdateVoucher />} />
             <Route path="/dashboard/update/vouchers/:voucherId" element={<CreateAndUpdateVoucher />} />
             <Route path="vouchers" element={<Vouchers />} />

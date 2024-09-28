@@ -42,4 +42,9 @@ userSchema.virtual("vouchers", {
   localField: "_id",
   foreignField: "user",
 });
+userSchema.virtual("vouchers", {
+  ref: "Voucher",
+  localField: "_id",
+  foreignField: "user",
+});
 export default mongoose.model("User", userSchema);
