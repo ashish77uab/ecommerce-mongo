@@ -180,7 +180,7 @@ chatNameSpace.use((socket, next) => {
 });
 // Handle connections to the chat namespace
 chatNameSpace.on('connection', (socket) => {
-  socket.join(socket.user?.id);
+  socket.join(socket.user?.id,'userId');
   activeUsers[socket.user?.id] = true;
   chatNameSpace.emit('activeUsers', Object.keys(activeUsers));
   // Event: User sends a message to the admin
@@ -220,9 +220,10 @@ chatNameSpace.on('connection', (socket) => {
     }
   });
 
-  // Event: User disconnects
   socket.on('disconnect', () => {
-    console.log(`User disconnected: ${socket.user.id}`);
+    // const userId = socket.user?.id
+   
+    // chatNameSpace.emit('activeUsers', Object.keys(activeUsers));
   });
 });
 

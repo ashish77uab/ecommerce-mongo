@@ -3,16 +3,13 @@ import { getAllUsersList, socketConnect, getAllUserMessagesList } from '../../ap
 import { toast } from 'react-toastify';
 import ToastMsg from '../../components/toast/ToastMsg';
 import { getUserToken } from '../../utils/constants';
-import { useSelector } from 'react-redux';
-import moment from 'moment';
-import UserItem from '../../components/chat/UserItem';
-import SingleMessageItem from '../../components/chat/SingleMessageItem';
-import SendMessage from '../../components/chat/SendMessage';
+import { useDispatch, useSelector } from 'react-redux';
 import ChatComponent from '../../components/chat/ChatComponent';
-
+import { setUsersToChat } from '../../redux/features/authSlice';
 const ChatUser = () => {
     const [text, setText] = useState('')
-    const { user } = useSelector(state => state?.auth)
+    const dispatch = useDispatch()
+    const { user, usersToChat } = useSelector(state => state?.auth)
     const limit = 10
     const [page, setPage] = useState(1);
     const [userId, setUserId] = useState(null);
@@ -45,7 +42,7 @@ const ChatUser = () => {
             const res = await getAllUsersList({ limit, page });
             const { status, data } = res;
             if (status >= 200 && status <= 300) {
-                setUsers(data);
+                dispatch(setUsersToChat(data));
             } else {
                 toast.error(<ToastMsg title={data.message} />);
             }
@@ -74,30 +71,68 @@ const ChatUser = () => {
     useEffect(() => {
         getAllUsers();
     }, [page]);
+    const updateUnReadMessage=(data)=>{
+        const tempUserId = data?.sender
+        let tempIndex;
+        const temparr = usersToChat?.users?.map((item, index) => {
+            if (item?._id === tempUserId) {
+                tempIndex = index
+                return { ...item, unreadMessages: [data, ...item.unreadMessages] }
+            } else {
+                return item
+            }
+        })
+        if (tempIndex) {
+            let tempElemt = temparr[tempIndex]
+            temparr?.splice(tempIndex, 1)
+            temparr?.splice(0, 0, tempElemt)
+
+        }
+        let tempData = { ...usersToChat, users: temparr }
+        dispatch(setUsersToChat(tempData));
+    }
     useEffect(() => {
         if (socketRef.current) {
             socketRef.current?.on('adminMessage', (data) => {
-                setMessages(prev => [...prev, data])
+                if (userId) {
+                    if (userId === data.sender) {
+                        setMessages((prev) => [...prev, data])
+                        updateUnReadMessage(data)
+                    }
+                } else {
+                    updateUnReadMessage(data)
+
+
+                }
             });
             socketRef.current.on('activeUsers', (activeUsers) => {
                 setActiveUsers(activeUsers)
             });
-
-
         }
+        
 
-    }, [])
+    }, [usersToChat, userId])
     const handleClickUser = (user) => {
         setUserId(user._id);
         getAllUserMessages(user._id)
         setSelectedUser(user)
+        const tempUserId = user._id
+        const temparr = usersToChat?.users?.map((item, index) => {
+            if (item?._id === tempUserId) {
+                return { ...item, unreadMessages: [] }
+            } else {
+                return item
+            }
+        })
+        let tempData = { ...usersToChat, users: temparr }
+        dispatch(setUsersToChat(tempData));
     }
     useEffect(() => {
         scrollToBottom();
     }, [messages]);
     return (
         <ChatComponent
-            users={users?.users}
+            users={usersToChat?.users}
             selectedUser={selectedUser}
             handleSubmit={handleSubmit}
             handleClickUser={handleClickUser}

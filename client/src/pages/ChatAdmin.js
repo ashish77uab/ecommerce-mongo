@@ -3,17 +3,15 @@ import { getUserToken } from '../utils/constants';
 import { getAllAdminList, getAllUserMessagesList, socketConnect } from '../api/api';
 import ToastMsg from '../components/toast/ToastMsg';
 import { toast } from 'react-toastify';
-import { useSelector } from 'react-redux';
-import moment from 'moment';
-import UserItem from '../components/chat/UserItem';
-import SingleMessageItem from '../components/chat/SingleMessageItem';
-import SendMessage from '../components/chat/SendMessage';
+import { useDispatch, useSelector } from 'react-redux';
 import ChatComponent from '../components/chat/ChatComponent';
+import { setUsersToChat } from '../redux/features/authSlice';
 
 
 const ChatAdmin = () => {
     const [text, setText] = useState('')
-    const { user } = useSelector(state => state?.auth)
+    const dispatch = useDispatch()
+    const { user, usersToChat } = useSelector(state => state?.auth)
     const limit = 10
     const [page, setPage] = useState(1);
     const [userId, setUserId] = useState(null);
@@ -47,9 +45,8 @@ const ChatAdmin = () => {
             const res = await getAllAdminList();
             const { status, data } = res;
             if (status >= 200 && status <= 300) {
-                setUsers(data);
-                // setUserId(data?.[0]?._id)
-                // setSelectedUser(data?.[0])
+                const tempData = { users: data }
+                dispatch(setUsersToChat(tempData));
             } else {
                 toast.error(<ToastMsg title={data.message} />);
             }
@@ -78,10 +75,38 @@ const ChatAdmin = () => {
     useEffect(() => {
         getAllAdmin();
     }, [page]);
+    const updateUnReadMessage=(data)=>{
+        const tempUserId = data?.sender
+        let tempIndex;
+        const temparr = usersToChat?.users?.map((item, index) => {
+            if (item?._id === tempUserId) {
+                tempIndex = index
+                return { ...item, unreadMessages: [data, ...item.unreadMessages] }
+            } else {
+                return item
+            }
+        })
+        if (tempIndex) {
+            let tempElemt = temparr[tempIndex]
+            temparr?.splice(tempIndex, 1)
+            temparr?.splice(0, 0, tempElemt)
+
+        }
+        let tempData = { ...usersToChat, users: temparr }
+        dispatch(setUsersToChat(tempData));
+    }
     useEffect(() => {
         if (socketRef.current) {
             socketRef.current?.on('userMessage', (data) => {
-                setMessages(prev => [...prev, data])
+                if (userId) {
+                    if (userId === data.sender) {
+                        setMessages((prev) => [...prev, data])
+                    }else{
+                        updateUnReadMessage(data)
+                    }
+                } else {
+                    updateUnReadMessage(data)
+                }
             });
             socketRef.current.on('activeUsers', (activeUsers) => {
                 console.log('Active users:', activeUsers);
@@ -89,8 +114,9 @@ const ChatAdmin = () => {
                 // Update the UI to reflect the active users
             });
         }
+        
 
-    }, [])
+    }, [usersToChat, userId])
     useEffect(() => {
         if (userId && user?._id) {
             getAllUserMessages(userId)
@@ -101,6 +127,16 @@ const ChatAdmin = () => {
         setUserId(user._id);
         getAllUserMessages(user._id)
         setSelectedUser(user)
+        const tempUserId = user._id
+        const temparr = usersToChat?.users?.map((item, index) => {
+            if (item?._id === tempUserId) {
+                return { ...item, unreadMessages: [] }
+            } else {
+                return item
+            }
+        })
+        let tempData = { ...usersToChat, users: temparr }
+        dispatch(setUsersToChat(tempData));
     }
     useEffect(() => {
         scrollToBottom();
@@ -108,7 +144,7 @@ const ChatAdmin = () => {
     return (
         <>
             <ChatComponent
-                users={users}
+                users={usersToChat?.users}
                 selectedUser={selectedUser}
                 handleSubmit={handleSubmit}
                 handleClickUser={handleClickUser}

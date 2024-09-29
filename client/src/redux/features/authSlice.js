@@ -15,10 +15,14 @@ const authSlice = createSlice({
     },
     notificationsLoading: false,
     updateLoading: false,
-    isNewNotification: isNewNotification
+    isNewNotification: isNewNotification,
+    usersToChat:{}
   },
   reducers: {
    
+    setUsersToChat: (state, action) => {
+      state.usersToChat = action.payload;
+    },
     setUser: (state, action) => {
       state.user = action.payload;
     },
@@ -76,6 +80,7 @@ const authSlice = createSlice({
 });
 
 export const {
+  setUsersToChat,
   setUser,
   setLogout,
   updateUser,
