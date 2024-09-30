@@ -23,12 +23,49 @@ const ChatAdmin = () => {
     const socketRef = useRef()
     const messagesEndRef = useRef(null);
     const [activeUsers, setActiveUsers] = useState([]);
+    const token = getUserToken()
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'instant' });
     };
-    if (!socketRef.current) {
-        socketRef.current = socketConnect('chat', getUserToken());
-    }
+   
+    useEffect(() => {
+        // Only establish the socket connection if it doesn't exist already
+        if (!socketRef.current && token) {
+            socketRef.current = socketConnect('chat', token); // Connect to chat namespace
+        }
+
+        const handleUserMessage = (data) => {
+            if (userId) {
+                if (userId === data.sender) {
+                    setMessages((prev) => [...prev, data]);
+                } else {
+                    updateUnReadMessage(data);
+                }
+            } else {
+                updateUnReadMessage(data);
+            }
+        };
+
+        // Function to handle the active users event
+        const handleActiveUsers = (activeUsers) => {
+            setActiveUsers(activeUsers);
+        };
+
+        socketRef.current.on('userMessage', handleUserMessage);
+        socketRef.current.on('activeUsers', handleActiveUsers);
+
+        // Cleanup function when the component unmounts
+        return () => {
+            if (socketRef.current) {
+                socketRef.current?.off('userMessage', handleUserMessage);
+                socketRef.current?.off('activeUsers', handleActiveUsers);
+                socketRef.current?.disconnect(); // Disconnect socket when component unmounts
+                socketRef.current = null; // Clear socket reference
+            }
+        };
+
+        // Dependencies array: only run effect when `userId` or `token` changes
+    }, [userId, token, usersToChat]);
     const handleSubmit = () => {
         const messageData = { text: text, adminId: userId };
         socketRef.current?.emit('userMessage', messageData);
@@ -95,34 +132,13 @@ const ChatAdmin = () => {
         let tempData = { ...usersToChat, users: temparr }
         dispatch(setUsersToChat(tempData));
     }
-    useEffect(() => {
-        if (socketRef.current) {
-            socketRef.current?.on('userMessage', (data) => {
-                if (userId) {
-                    if (userId === data.sender) {
-                        setMessages((prev) => [...prev, data])
-                    }else{
-                        updateUnReadMessage(data)
-                    }
-                } else {
-                    updateUnReadMessage(data)
-                }
-            });
-            socketRef.current.on('activeUsers', (activeUsers) => {
-                console.log('Active users:', activeUsers);
-                setActiveUsers(activeUsers)
-                // Update the UI to reflect the active users
-            });
-        }
-        
-
-    }, [usersToChat, userId])
+  
     useEffect(() => {
         if (userId && user?._id) {
             getAllUserMessages(userId)
         }
 
-    }, [userId])
+    }, [userId, user])
     const handleClickUser = (user) => {
         setUserId(user._id);
         getAllUserMessages(user._id)
@@ -141,6 +157,7 @@ const ChatAdmin = () => {
     useEffect(() => {
         scrollToBottom();
     }, [messages]);
+
     return (
         <>
             <ChatComponent

@@ -98,7 +98,7 @@ productNamespace.on('connection', (socket) => {
   });
 
   socket.on('disconnect', (socket) => {
-    console.log('A user disconnected');
+    // console.log('A user disconnected');
   });
 });
 
@@ -107,7 +107,6 @@ const notificationNamespaces = io.of("/notifications");
 notificationNamespaces.on("connection", (socket) => {
 
   socket.on("connect-notification", async ({ userId }) => {
-    console.log(userId, 'userId')
     socket.join(userId);
   });
   socket.on("send-notification-admin", async ({ userId, voucherId }) => {
@@ -161,10 +160,10 @@ notificationNamespaces.on("connection", (socket) => {
   });
 
   socket.on("disconnect", () => {
-    console.log("A user disconnected from the notifications namespace");
+    // console.log("A user disconnected from the notifications namespace");
   });
 });
-const activeUsers = {};
+let activeUsers = [];
 const chatNameSpace = io.of("/chat");
 chatNameSpace.use((socket, next) => {
   const token = socket.handshake.auth.token; // Assuming token is sent in the handshake
@@ -180,9 +179,12 @@ chatNameSpace.use((socket, next) => {
 });
 // Handle connections to the chat namespace
 chatNameSpace.on('connection', (socket) => {
-  socket.join(socket.user?.id,'userId');
-  activeUsers[socket.user?.id] = true;
-  chatNameSpace.emit('activeUsers', Object.keys(activeUsers));
+  
+  if (!activeUsers.includes(socket.user?.id)) {
+    activeUsers.push(socket.user?.id);
+    socket.join(socket.user?.id);
+  }
+  chatNameSpace.emit('activeUsers', activeUsers);
   // Event: User sends a message to the admin
   socket.on('userMessage', async (data) => {
     try {
@@ -195,6 +197,8 @@ chatNameSpace.on('connection', (socket) => {
 
       // Emit the message to the admin
       chatNameSpace.to(adminId).emit('adminMessage', createdMessage);
+      console.log("adminMessage users emitted:", createdMessage);
+
     } catch (error) {
       console.error('Error saving user message:', error);
     }
@@ -219,11 +223,17 @@ chatNameSpace.on('connection', (socket) => {
       console.error('Error saving admin message:', error);
     }
   });
+  // socket.on('leaveUser', (data) => {
+  //   const { userId } = data; // Destructure the userId
+  //   activeUsers = activeUsers.filter(user => user !== userId);
+  //   chatNameSpace.emit('activeUsers', activeUsers);
+  // });
 
   socket.on('disconnect', () => {
-    // const userId = socket.user?.id
-   
-    // chatNameSpace.emit('activeUsers', Object.keys(activeUsers));
+    if (socket.user?.id) {
+      activeUsers = activeUsers.filter(user => user !== socket.user?.id);
+      chatNameSpace.emit('activeUsers', activeUsers);
+    }
   });
 });
 

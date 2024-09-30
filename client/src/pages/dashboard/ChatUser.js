@@ -20,6 +20,7 @@ const ChatUser = () => {
     const [users, setUsers] = useState([]);
     const socketRef = useRef()
     const messagesEndRef = useRef(null);
+    const token = getUserToken()
     const [activeUsers, setActiveUsers] = useState([]);
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'instant' });
@@ -92,26 +93,41 @@ const ChatUser = () => {
         dispatch(setUsersToChat(tempData));
     }
     useEffect(() => {
-        if (socketRef.current) {
-            socketRef.current?.on('adminMessage', (data) => {
-                if (userId) {
-                    if (userId === data.sender) {
-                        setMessages((prev) => [...prev, data])
-                        updateUnReadMessage(data)
-                    }
-                } else {
-                    updateUnReadMessage(data)
-
-
-                }
-            });
-            socketRef.current.on('activeUsers', (activeUsers) => {
-                setActiveUsers(activeUsers)
-            });
+        if (!socketRef.current && token) {
+            socketRef.current = socketConnect('chat', token);
         }
-        
 
-    }, [usersToChat, userId])
+        const handleUserMessage = (data) => {
+            console.log('data','data at socket')
+            if (userId) {
+                if (userId === data.sender) {
+                    setMessages((prev) => [...prev, data]);
+                } else {
+                    updateUnReadMessage(data);
+                }
+            } else {
+                updateUnReadMessage(data);
+            }
+        };
+
+        const handleActiveUsers = (activeUsers) => {
+            setActiveUsers(activeUsers);
+        };
+
+        socketRef.current.on('adminMessage', handleUserMessage);
+        socketRef.current.on('activeUsers', handleActiveUsers);
+        return () => {
+            if (socketRef.current) {
+                // socketRef.current?.off('adminMessage', handleUserMessage);
+                // socketRef.current?.off('activeUsers', handleActiveUsers);
+                socketRef.current?.disconnect(); // Disconnect socket when component unmounts
+                socketRef.current = null; // Clear socket reference
+            }
+        };
+
+        // Dependencies array: only run effect when `userId` or `token` changes
+    }, [ token, usersToChat]);
+  
     const handleClickUser = (user) => {
         setUserId(user._id);
         getAllUserMessages(user._id)

@@ -15,8 +15,8 @@ const UserItem = ({ handleClickUser, user, userId, activeUsers }) => {
                 <h6 className={`heading-6 leading-[1] ${user?._id === userId ? 'text-white ' : 'text-black'}`}>{user?.fullName}</h6>
                 <div className='flex items-start gap-1  line-clamp-1'>
                     <p className={`opacity-80 flex-grow  leading-[1] mt-1 ${user?._id === userId ? 'text-white ' : 'text-black'}`}>{singleMessage?.text}</p>
-                   {hasUnread && userId!==user?._id && <p className={`opacity-80 min-w-[24px] h-6 font-semibold rounded-full flex-center bg-green-500 flex-shrink-0  text-sm leading-[1] mt-1 ${user?._id === userId ? 'text-white ' : 'text-black'}`}>{user?.unreadMessages?.length}</p>}
-                    <p className={`opacity-80 flex-shrink-0  text-xs leading-[1] mt-1 ${user?._id === userId ? 'text-white ' : 'text-black'}`}>{moment(singleMessage?.createdAt)?.format('hh:mm a')}</p>
+                   {hasUnread && userId!==user?._id && <p className={`opacity-80 min-w-[24px] h-6 font-semibold rounded-full flex-center bg-green-500 flex-shrink-0  text-sm leading-[1] mt-1 text-white`}>{user?.unreadMessages?.length}</p>}
+                    {singleMessage && <p className={`opacity-80 flex-shrink-0  text-xs leading-[1] mt-1 ${user?._id === userId ? 'text-white ' : 'text-black'}`}>{moment(singleMessage?.createdAt)?.format('hh:mm a')}</p>}
                 </div>
             </div>
 

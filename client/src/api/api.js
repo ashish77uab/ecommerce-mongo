@@ -5,6 +5,7 @@ const devEnv = process.env.NODE_ENV !== "production";
 const { REACT_APP_DEV_API, REACT_APP_PROD_API } = process.env;
 const baseURL = `${devEnv ? REACT_APP_DEV_API : REACT_APP_PROD_API}`
 export const socketConnect = (namespace,token) => {
+
   return io(`${baseURL}${namespace}`,{
     auth: {
       token, 
