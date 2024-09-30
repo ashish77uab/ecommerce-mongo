@@ -118,14 +118,13 @@ const ChatUser = () => {
         socketRef.current.on('activeUsers', handleActiveUsers);
         return () => {
             if (socketRef.current) {
-                // socketRef.current?.off('adminMessage', handleUserMessage);
-                // socketRef.current?.off('activeUsers', handleActiveUsers);
+                socketRef.current?.off('adminMessage', handleUserMessage);
+                socketRef.current?.off('activeUsers', handleActiveUsers);
                 socketRef.current?.disconnect(); // Disconnect socket when component unmounts
                 socketRef.current = null; // Clear socket reference
             }
         };
 
-        // Dependencies array: only run effect when `userId` or `token` changes
     }, [ token, usersToChat]);
   
     const handleClickUser = (user) => {

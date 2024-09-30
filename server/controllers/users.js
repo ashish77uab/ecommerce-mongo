@@ -335,28 +335,42 @@ export const getUsers = async (req, res) => {
       {
         $lookup: {
           from: "messages",
-          let: { userId: "$_id" },
+          let: { userId: "$_id" }, // Variable to use in pipeline (current user ID)
           pipeline: [
             {
               $match: {
                 $expr: {
                   $and: [
-                    { $eq: ["$sender", "$$userId"] },
-                    { $eq: ["$recipient", mongoose.Types.ObjectId(userId)] }, // Match recipient to the user
-                    { $eq: ["$read", true] }, // Only read messages
-                  ],
-                },
-              },
+                    {
+                      $or: [
+                        {
+                          $and: [
+                            { $eq: ["$sender", mongoose.Types.ObjectId(userId)] }, // sender is userId
+                            { $eq: ["$recipient", "$$userId"] } // recipient is current userId
+                          ]
+                        },
+                        {
+                          $and: [
+                            { $eq: ["$sender", "$$userId"] }, // sender is current userId
+                            { $eq: ["$recipient", mongoose.Types.ObjectId(userId)] } // recipient is userId
+                          ]
+                        }
+                      ]
+                    },
+                    { $eq: ["$read", true] } // Only include read messages
+                  ]
+                }
+              }
             },
             {
-              $sort: { createdAt: -1 }, // Most recent read message
+              $sort: { createdAt: -1 } // Sort by createdAt (most recent first)
             },
             {
-              $limit: 1, // Get only the latest read message
-            },
+              $limit: 1 // Limit to 1 (get the latest read message)
+            }
           ],
-          as: "latestReadMessage",
-        },
+          as: "latestReadMessage"
+        }
       },
       {
         $sort: { createdAt: -1 }, // Sort the results by createdAt (most recent orders first)
@@ -414,28 +428,42 @@ export const getAllAdmin = async (req, res) => {
       {
         $lookup: {
           from: "messages",
-          let: { userId: "$_id" },
+          let: { userId: "$_id" }, // Variable to use in pipeline (current user ID)
           pipeline: [
             {
               $match: {
                 $expr: {
                   $and: [
-                    { $eq: ["$sender", "$$userId"] },
-                    { $eq: ["$recipient", mongoose.Types.ObjectId(userId)] }, // Match recipient to the user
-                    { $eq: ["$read", true] }, // Only read messages
-                  ],
-                },
-              },
+                    {
+                      $or: [
+                        {
+                          $and: [
+                            { $eq: ["$sender", mongoose.Types.ObjectId(userId)] }, // sender is userId
+                            { $eq: ["$recipient", "$$userId"] } // recipient is current userId
+                          ]
+                        },
+                        {
+                          $and: [
+                            { $eq: ["$sender", "$$userId"] }, // sender is current userId
+                            { $eq: ["$recipient", mongoose.Types.ObjectId(userId)] } // recipient is userId
+                          ]
+                        }
+                      ]
+                    },
+                    { $eq: ["$read", true] } // Only include read messages
+                  ]
+                }
+              }
             },
             {
-              $sort: { createdAt: -1 }, // Most recent read message
+              $sort: { createdAt: -1 } // Sort by createdAt (most recent first)
             },
             {
-              $limit: 1, // Get only the latest read message
-            },
+              $limit: 1 // Limit to 1 (get the latest read message)
+            }
           ],
-          as: "latestReadMessage",
-        },
+          as: "latestReadMessage"
+        }
       },
       {
         $sort: { createdAt: -1 }, // Sort the results by createdAt (most recent orders first)

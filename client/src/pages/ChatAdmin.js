@@ -17,7 +17,6 @@ const ChatAdmin = () => {
     const [userId, setUserId] = useState(null);
     const [selectedUser, setSelectedUser] = useState(null);
     const [fetchLoading, setFetchLoading] = useState(false);
-    const [users, setUsers] = useState([]);
     const [messageLoading, setMessageLoading] = useState(false);
     const [messages, setMessages] = useState([]);
     const socketRef = useRef()
@@ -29,9 +28,8 @@ const ChatAdmin = () => {
     };
    
     useEffect(() => {
-        // Only establish the socket connection if it doesn't exist already
         if (!socketRef.current && token) {
-            socketRef.current = socketConnect('chat', token); // Connect to chat namespace
+            socketRef.current = socketConnect('chat', token); 
         }
 
         const handleUserMessage = (data) => {
@@ -46,7 +44,6 @@ const ChatAdmin = () => {
             }
         };
 
-        // Function to handle the active users event
         const handleActiveUsers = (activeUsers) => {
             setActiveUsers(activeUsers);
         };
@@ -54,18 +51,16 @@ const ChatAdmin = () => {
         socketRef.current.on('userMessage', handleUserMessage);
         socketRef.current.on('activeUsers', handleActiveUsers);
 
-        // Cleanup function when the component unmounts
         return () => {
             if (socketRef.current) {
                 socketRef.current?.off('userMessage', handleUserMessage);
                 socketRef.current?.off('activeUsers', handleActiveUsers);
-                socketRef.current?.disconnect(); // Disconnect socket when component unmounts
-                socketRef.current = null; // Clear socket reference
+                socketRef.current?.disconnect(); 
+                socketRef.current = null; 
             }
         };
 
-        // Dependencies array: only run effect when `userId` or `token` changes
-    }, [userId, token, usersToChat]);
+    }, [token, usersToChat]);
     const handleSubmit = () => {
         const messageData = { text: text, adminId: userId };
         socketRef.current?.emit('userMessage', messageData);
