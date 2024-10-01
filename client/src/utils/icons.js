@@ -45,7 +45,7 @@ import {
 } from "react-icons/ai";
 import { MdOutlineInventory } from "react-icons/md";
 import { IoChatbubbleEllipsesOutline } from "react-icons/io5";
-
+import { FaPaperPlane } from "react-icons/fa";
 export const reactIcons = {
   plus: <BsPlusLg />,
   minus: <AiOutlineMinus />,
@@ -92,5 +92,6 @@ export const reactIcons = {
   read: <MdOutlineMarkChatRead />,
   unread: <MdOutlineMarkChatUnread />,
   dotFill: <GoDotFill/>,
-  chat: <IoChatbubbleEllipsesOutline/>
+  chat: <IoChatbubbleEllipsesOutline/>,
+  plane: <FaPaperPlane/>
 };
