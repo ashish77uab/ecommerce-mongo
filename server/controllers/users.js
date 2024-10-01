@@ -373,7 +373,12 @@ export const getUsers = async (req, res) => {
         }
       },
       {
-        $sort: { createdAt: -1 }, // Sort the results by createdAt (most recent orders first)
+        $addFields: {
+          unreadMessageCount: { $size: "$unreadMessages" }, // Add a field to store the number of unread messages
+        },
+      },
+      {
+        $sort: { unreadMessageCount: -1 }, // Sort by the number of unread messages (descending order)
       },
       {
         $skip: skip, // Skip the necessary number of documents for pagination
@@ -466,7 +471,12 @@ export const getAllAdmin = async (req, res) => {
         }
       },
       {
-        $sort: { createdAt: -1 }, // Sort the results by createdAt (most recent orders first)
+        $addFields: {
+          unreadMessageCount: { $size: "$unreadMessages" }, // Add a field to store the number of unread messages
+        },
+      },
+      {
+        $sort: { unreadMessageCount: -1 }, // Sort by the number of unread messages (descending order)
       },
      
 
