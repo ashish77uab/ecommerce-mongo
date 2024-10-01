@@ -357,7 +357,7 @@ export const getUsers = async (req, res) => {
                         }
                       ]
                     },
-                    { $eq: ["$read", true] } // Only include read messages
+                    // { $eq: ["$read", true] } // Only include read messages
                   ]
                 }
               }
@@ -450,7 +450,7 @@ export const getAllAdmin = async (req, res) => {
                         }
                       ]
                     },
-                    { $eq: ["$read", true] } // Only include read messages
+                    // { $eq: ["$read", true] } // Only include read messages
                   ]
                 }
               }

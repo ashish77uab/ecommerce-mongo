@@ -32,7 +32,7 @@ const ChatAdmin = () => {
             socketRef.current = socketConnect('chat', token); 
         }
 
-        const handleUserMessage = (data) => {
+        const handleUserMessage =  (data) => {
             if (userId) {
                 if (userId === data.sender) {
                     setMessages((prev) => [...prev, data]);
@@ -138,16 +138,16 @@ const ChatAdmin = () => {
         setUserId(user._id);
         getAllUserMessages(user._id)
         setSelectedUser(user)
-        const tempUserId = user._id
-        const temparr = usersToChat?.users?.map((item, index) => {
-            if (item?._id === tempUserId) {
-                return { ...item, unreadMessages: [] }
-            } else {
-                return item
-            }
-        })
-        let tempData = { ...usersToChat, users: temparr }
-        dispatch(setUsersToChat(tempData));
+        // const tempUserId = user._id
+        // const temparr = usersToChat?.users?.map((item, index) => {
+        //     if (item?._id === tempUserId) {
+        //         return { ...item, unreadMessages: [] }
+        //     } else {
+        //         return item
+        //     }
+        // })
+        // let tempData = { ...usersToChat, users: temparr }
+        // dispatch(setUsersToChat(tempData));
     }
     useEffect(() => {
         scrollToBottom();

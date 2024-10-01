@@ -30,4 +30,18 @@ export const getAllMessages = async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 };
+export const readMessage = async (req, res) => {
+  try {
+    const { messageId } = req.params; // Extract userId and adminId from the request parameters
+   const updatedMessage=   await Message.findByIdAndUpdate(messageId,{
+      $set:{ read:true}
+    },{
+      new:true
+    })
+    res.status(200).json(updatedMessage);
+  } catch (error) {
+    console.error('Error while update single message read ', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
 

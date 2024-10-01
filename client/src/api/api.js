@@ -113,3 +113,4 @@ export const deleteVoucher = (voucherId) => API.delete(`voucher/delete/${voucher
 export const checkVoucherCode = (data) => API.post(`voucher/check`, data);
 
 export const getAllUserMessagesList = (userId, adminId) => API.get(`messages/user/${userId}/${adminId}`);
+export const readMessage = (messageId) => API.put(`messages/read/${messageId}}`);
