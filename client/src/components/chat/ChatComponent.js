@@ -11,7 +11,7 @@ const ChatComponent = forwardRef(({ users, selectedUser, handleSubmit, handleCli
             <div className='w-96 flex flex-col border-r border-r-zinc-300   rounded-md rounded-r-none  h-full overflow-x-hidden overflow-y-auto'>
                 {users?.map((user) => {
                     return (
-                        <UserItem key={user?._id} activeUsers={activeUsers} user={user} userId={userId} handleClickUser={handleClickUser} />
+                        <UserItem key={user?._id} activeUsers={activeUsers} user={user} messages={messages} userId={userId} handleClickUser={handleClickUser} />
                     )
                 })}
             </div>

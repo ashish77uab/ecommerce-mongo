@@ -1,10 +1,11 @@
 import moment from 'moment'
 import React from 'react'
 
-const UserItem = ({ handleClickUser, user, userId, activeUsers }) => {
+const UserItem = ({ handleClickUser, user, userId, activeUsers,messages }) => {
+    console.log(messages,'messagea')
     const isActive = activeUsers?.includes(user?._id)
     const hasUnread = user?.unreadMessages?.length>0
-    const singleMessage = hasUnread ? user?.unreadMessages?.[0] : user?.latestReadMessage?.[0]
+    const singleMessage = user?._id === userId ? messages?.[messages?.length-1]   : hasUnread ? user?.unreadMessages?.[0] : user?.latestReadMessage?.[0]
     return (
         <div onClick={() => handleClickUser(user)} className={`flex items-start gap-4 border-b border-b-zinc-300  px-4 py-3 cursor-pointer ${user?._id === userId ? 'bg-sky-500' : 'bg-white'} `}>
             <div className='w-12 h-12 shadow-lg rounded-full relative bg-gray-200'>
