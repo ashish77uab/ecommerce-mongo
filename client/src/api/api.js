@@ -4,23 +4,23 @@ const devEnv = process.env.NODE_ENV !== "production";
 
 const { REACT_APP_DEV_API, REACT_APP_PROD_API } = process.env;
 const baseURL = `${devEnv ? REACT_APP_DEV_API : REACT_APP_PROD_API}`
-export const socketConnect = (namespace,token) => {
+export const socketConnect = (namespace, token) => {
 
-  return io(`${baseURL}${namespace}`,{
+  return io(`${baseURL}${namespace}`, {
     auth: {
-      token, 
+      token,
     },
     transports: ['websocket']
   });
 }
 const API = axios.create({
-  baseURL: baseURL ,
+  baseURL: baseURL,
   withCredentials: true,
 });
 
 API.interceptors.request.use((req) => {
-  if (localStorage.getItem("ashishToken")) {
-    req.headers.Authorization = `Bearer ${localStorage.getItem("ashishToken")}`;
+  if (localStorage.getItem("loginToken")) {
+    req.headers.Authorization = `Bearer ${localStorage.getItem("loginToken")}`;
   }
   return req;
 });
@@ -60,7 +60,7 @@ export const updateProduct = (id, formData) =>
   API.put(`products/${id}`, formData);
 export const deleteProductImage = (id, formData) =>
   API.put(`products/delete-product-image/${id}`, formData);
-export const addProductReview = ( formData) =>
+export const addProductReview = (formData) =>
   API.post(`products/add-product-review`, formData);
 export const editProductReview = (id, formData) =>
   API.put(`products/edit-product-review/${id}`, formData);
@@ -106,7 +106,7 @@ export const readNotification = (notificationId) => API.put(`auth/notifications/
 
 // Vouchers
 export const getAllVouchers = (data) => API.get(`voucher?page=${data?.page}&limit=${data?.limit}`);
-export const createVoucher = (data) => API.post(`voucher/create`,data);
+export const createVoucher = (data) => API.post(`voucher/create`, data);
 export const updateVoucher = (voucherId, data) => API.put(`voucher/update/${voucherId}`, data);
 export const getVoucher = (voucherId) => API.get(`voucher/single/${voucherId}`);
 export const deleteVoucher = (voucherId) => API.delete(`voucher/delete/${voucherId}`);

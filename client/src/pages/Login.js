@@ -15,7 +15,7 @@ const initialState = {
   password: "",
 };
 const Login = () => {
-    const dispatch=useDispatch()
+  const dispatch = useDispatch()
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const [form, setForm] = useState(initialState);
@@ -41,7 +41,7 @@ const Login = () => {
       const { status, data } = res;
       if (status >= 200 && status < 300) {
         toast.success(<ToastMsg title={`Login Successfully`} />);
-        localStorage.setItem("ashishToken", data.token);
+        localStorage.setItem("loginToken", data.token);
         handleReset();
         navigate("/");
         dispatch(setUser(data.result))

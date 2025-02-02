@@ -10,16 +10,16 @@ const authSlice = createSlice({
     error: "",
     loading: false,
     notifications: {
-      notifications:[],
+      notifications: [],
       totalNotifications: 0,
     },
     notificationsLoading: false,
     updateLoading: false,
     isNewNotification: isNewNotification,
-    usersToChat:{}
+    usersToChat: {}
   },
   reducers: {
-   
+
     setUsersToChat: (state, action) => {
       state.usersToChat = action.payload;
     },
@@ -30,7 +30,7 @@ const authSlice = createSlice({
       state.isNewNotification = action.payload;
     },
     updateNotification: (state, action) => {
-      state.notifications = { ...state?.notifications, notifications: [action.payload,...state?.notifications?.notifications], totalNotifications: state?.notifications?.totalNotifications+1 };
+      state.notifications = { ...state?.notifications, notifications: [action.payload, ...state?.notifications?.notifications], totalNotifications: state?.notifications?.totalNotifications + 1 };
     },
     updateUserCarts: (state, action) => {
       state.user.carts = [...state.user.carts, action.payload];
@@ -48,7 +48,7 @@ const authSlice = createSlice({
       state.user = { ...state.user, ...action.payload };
     },
     setLogout: (state, action) => {
-      localStorage.removeItem("ashishToken");
+      localStorage.removeItem("loginToken");
       state.user = null;
     },
     deleteNotificationStart: (state, action) => {

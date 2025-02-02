@@ -15,7 +15,7 @@ const Navbar = () => {
   }
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const {  user } = useSelector((state) => state.auth);
+  const { user } = useSelector((state) => state.auth);
   const cartLength = user?.carts?.length;
   const wishlistLength = user?.whislistItems?.length;
   const handleLogout = () => {
@@ -31,17 +31,17 @@ const Navbar = () => {
     dispatch(toggleNewNotification(true))
   }
   useEffect(() => {
-   
+
     if (isLoggedIn && user?._id) {
-     socket?.emit('connect-notification', { userId: user?._id });
-     socket?.on('notify-user', (data) => {
+      socket?.emit('connect-notification', { userId: user?._id });
+      socket?.on('notify-user', (data) => {
         handleUpdateNotificationCount()
         dispatch(updateNotification(data))
       });
     }
     return () => {
-     socket?.disconnect();
-     socket?.off('notify-user');
+      socket?.disconnect();
+      socket?.off('notify-user');
     };
   }, [isLoggedIn, user]);
 
@@ -51,7 +51,7 @@ const Navbar = () => {
         <div className="flex items-center justify-between">
           <div className="">
             <Link to="/" className="font-extrabold text-3xl text-amber-600">
-              Ashish AK47
+              Aman Ecom App
             </Link>
           </div>
           <div className="flex gap-2 items-center">
@@ -81,7 +81,7 @@ const Navbar = () => {
 
                   {reactIcons.heartFill}
                 </Link>
-                <NotificationPopper  dispatch={dispatch} />
+                <NotificationPopper dispatch={dispatch} />
                 <Menu as="div" className="relative">
                   <Menu.Button
                     className={
@@ -117,8 +117,8 @@ const Navbar = () => {
                             <button
                               onClick={() => navigate(`/profile/${user._id}`)}
                               className={`${active
-                                  ? "bg-violet-500 text-white"
-                                  : "text-gray-900"
+                                ? "bg-violet-500 text-white"
+                                : "text-gray-900"
                                 } group flex w-full items-center rounded-md px-2 py-2 text-base`}
                             >
                               Profile
@@ -130,8 +130,8 @@ const Navbar = () => {
                             <button
                               onClick={() => navigate(`/dashboard`)}
                               className={`${active
-                                  ? "bg-violet-500 text-white"
-                                  : "text-gray-900"
+                                ? "bg-violet-500 text-white"
+                                : "text-gray-900"
                                 } group flex w-full items-center rounded-md px-2 py-2 text-base`}
                             >
                               Go to dashboard
@@ -144,11 +144,11 @@ const Navbar = () => {
                             <button
                               onClick={() => navigate(`/chat-admin`)}
                               className={`${active
-                                  ? "bg-violet-500 text-white"
-                                  : "text-gray-900"
+                                ? "bg-violet-500 text-white"
+                                : "text-gray-900"
                                 } group flex w-full items-center rounded-md px-2 py-2 text-base`}
                             >
-                             Chat with admin
+                              Chat with admin
                             </button>
                           )}
                         </Menu.Item>
@@ -158,8 +158,8 @@ const Navbar = () => {
                             <button
                               onClick={() => navigate(`/orders`)}
                               className={`${active
-                                  ? "bg-violet-500 text-white"
-                                  : "text-gray-900"
+                                ? "bg-violet-500 text-white"
+                                : "text-gray-900"
                                 } group flex w-full items-center rounded-md px-2 py-2 text-base`}
                             >
                               My orders
@@ -171,8 +171,8 @@ const Navbar = () => {
                             <button
                               onClick={handleLogout}
                               className={`${active
-                                  ? "bg-violet-500 text-white"
-                                  : "text-gray-900"
+                                ? "bg-violet-500 text-white"
+                                : "text-gray-900"
                                 } group flex w-full items-center rounded-md px-2 py-2 text-base`}
                             >
                               Log out

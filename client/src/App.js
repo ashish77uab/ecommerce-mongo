@@ -54,7 +54,7 @@ function App() {
     }
   };
   useEffect(() => {
-    if (localStorage.getItem("ashishToken")) {
+    if (localStorage.getItem("loginToken")) {
       getUserData();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -73,7 +73,7 @@ function App() {
             <Route path="/categories" element={<AllCategories />} />
             <Route path="/orders" element={<ProtectedRoutes> <OrderDetailsPage /></ProtectedRoutes>} />
             <Route path="/profile/:userId" element={<ProtectedRoutes> <Profile /></ProtectedRoutes>} />
-            <Route path="/chat-admin" element={<ProtectedRoutes> <ChatAdmin  /></ProtectedRoutes>} />
+            <Route path="/chat-admin" element={<ProtectedRoutes> <ChatAdmin /></ProtectedRoutes>} />
           </Route>
           <Route path="/dashboard" element={<DashboardLayout />}>
             <Route index element={<Dashboard />} />
